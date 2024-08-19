@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematik Mittelschule</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+</head>
+<body>
+    <header>
+        <h1>Mathematikthemen für die Mittelschule</h1>
+    </header>
+    <nav id="main-nav">
+        <!-- Navigation will be dynamically populated -->
+    </nav>
+    <main id="content">
+        <!-- Content will be dynamically loaded here -->
+    </main>
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+              .then((reg) => console.log('Service worker registered', reg))
+              .catch((err) => console.log('Service worker not registered', err));
+        }
+    </script>
+</body>
+</html>
