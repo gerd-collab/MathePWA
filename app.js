@@ -2,7 +2,6 @@ const content = {
     'klasse2': {
       'title': 'Klasse 2',
       'topics': [
-        'Einführung',
         'Teilbarkeit',
         'Bruchrechnen',
         'Ganze Zahlen',
