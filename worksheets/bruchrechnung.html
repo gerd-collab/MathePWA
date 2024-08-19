@@ -20,9 +20,11 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            position: relative;
         }
         h1 {
             color: #4a90e2;
+            margin-top: 50px;
         }
         .fraction, .mixed-number {
             display: inline-block;
@@ -92,10 +94,22 @@
             display: flex;
             justify-content: center;
         }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #e74c3c;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <button class="back-button" onclick="goBack()">Zurück</button>
         <h1>Bruchrechnung lernen mit unterteilten Kreisdiagrammen</h1>
         <div>
             <div class="fraction">
@@ -272,6 +286,10 @@
                 drawCircle(elementId2, remainderNum, den, baseColor);
                 element2.style.display = 'inline-block';
             }
+        }
+
+        function goBack() {
+            window.history.back();
         }
 
         // Initial zeichnen

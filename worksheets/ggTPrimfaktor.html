@@ -107,6 +107,7 @@
 </head>
 <body>
     <div class="container">
+        <button class="back-button" onclick="goBack()">Zurück</button>
         <h1>ggT-Übung mit Primfaktorzerlegung</h1>
         <div class="grosse-aufgabe">
             Bestimme den ggT von <span id="zahl1">28</span> und <span id="zahl2">60</span>
@@ -242,6 +243,10 @@
 
         ueberpruefen.addEventListener('click', ueberpruefeEingaben);
         neueAufgabe.addEventListener('click', generiereAufgabe);
+
+        function goBack() {
+            window.history.back();
+        }
 
         // Initiale Aufgabe generieren
         generiereAufgabe();

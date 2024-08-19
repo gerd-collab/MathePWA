@@ -101,6 +101,7 @@
 </head>
 <body>
     <div class="container">
+        <button class="back-button" onclick="goBack()">Zurück</button>
         <h1>KGV Arbeitsblatt</h1>
         <p id="aufgabe"></p>
         <div>
@@ -195,6 +196,10 @@
                 ? '<span class="alert-icon">✓</span> Richtig! Sehr gut gemacht!'
                 : '<span class="alert-icon">✗</span> Nicht ganz richtig. Versuche es noch einmal!';
             feedback.style.display = 'flex';
+        }
+
+        function goBack() {
+            window.history.back();
         }
 
         generiereNeueAufgabe();

@@ -87,6 +87,7 @@
     </style>
 </head>
 <body>
+    <button class="back-button" onclick="goBack()">Zurück</button>
     <h1>Primfaktorzerlegung</h1>
     <div class="button-container">
         <button id="button100" class="active">bis 100</button>
@@ -254,6 +255,10 @@
         document.getElementById('button500').addEventListener('click', () => setMaxNumber(500));
         document.getElementById('newProblemButton').addEventListener('click', generateNewProblem);
         document.getElementById('checkButton').addEventListener('click', checkAnswer);
+
+        function goBack() {
+            window.history.back();
+        }
 
         generateNewProblem();
     </script>

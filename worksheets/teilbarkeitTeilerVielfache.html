@@ -74,6 +74,7 @@
     </style>
 </head>
 <body>
+    <button class="back-button" onclick="goBack()">Zurück</button>
     <h1>Erweiterte Teilbarkeit, Teiler und Vielfache Übung</h1>
     <p>Gib eine Zahl ein und wähle dann eine Operation:</p>
     <input type="text" id="numberInput" placeholder="Zahl eingeben" inputmode="numeric" pattern="[0-9]*">
@@ -167,6 +168,11 @@
             result += '</div>';
             resultDiv.innerHTML = result;
         }
+
+        function goBack() {
+            window.history.back();
+        }
+
 
         // Nur Zahlen erlauben
         numberInput.addEventListener('input', function(e) {

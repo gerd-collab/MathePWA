@@ -67,6 +67,7 @@
     </style>
 </head>
 <body>
+    <button class="back-button" onclick="goBack()">Zurück</button>
     <h1>Primzahlen-Entdecker</h1>
     <div id="grid"></div>
     <button id="check">Überprüfen</button>
@@ -125,6 +126,11 @@
                 el.classList.remove('prime', 'correct-prime', 'missed-prime', 'wrong-prime');
             });
         }
+
+        function goBack() {
+            window.history.back();
+        }
+
 
         createGrid();
         checkButton.addEventListener('mousedown', highlightPrimes);

@@ -125,6 +125,7 @@
 </head>
 <body>
     <div class="container">
+        <button class="back-button" onclick="goBack()">Zurück</button>
         <h1>ggT-Übung</h1>
         <div class="grosse-aufgabe">
             Bestimme den ggT von <span id="zahl1">5</span> und <span id="zahl2">19</span>
@@ -241,6 +242,10 @@
 
         ueberpruefen.addEventListener('click', ueberpruefeEingaben);
         neueAufgabe.addEventListener('click', generiereAufgabe);
+        
+        function goBack() {
+            window.history.back();
+        }
 
         // Initiale Aufgabe generieren
         generiereAufgabe();
