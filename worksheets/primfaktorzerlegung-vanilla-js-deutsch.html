@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primfaktorzerlegung Übungsblatt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        h1 {
+            text-align: center;
+            color: #4a9eff;
+        }
+        .problem-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            height: 100px;
+        }
+        #currentNumber {
+            font-size: 72px;
+            font-weight: bold;
+            color: #4a9eff;
+        }
+        .inputs-container, .reorder-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        input {
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #4a4a4a;
+            border-radius: 4px;
+        }
+        input[data-width="1"] { width: 40px; }
+        input[data-width="2"] { width: 50px; }
+        input[data-width="3"] { width: 60px; }
+        .multiply-dot, .equals-sign {
+            font-size: 24px;
+            color: #4a9eff;
+            margin: 0 5px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4a9eff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #3a7fcf;
+        }
+        button.active {
+            background-color: #2a5f9f;
+        }
+        button.inactive {
+            background-color: #2a2a2a;
+            color: #888888;
+        }
+        #result {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Primfaktorzerlegung</h1>
+    <div class="button-container">
+        <button id="button100" class="active">bis 100</button>
+        <button id="button500" class="inactive">bis 500</button>
+    </div>
+    <div class="problem-container">
+        <span id="currentNumber"></span>
+    </div>
+    <div id="inputsContainer" class="inputs-container"></div>
+    <div id="reorderContainer" class="reorder-container" style="display:none;"></div>
+    <div class="button-container">
+        <button id="checkButton">Überprüfen</button>
+        <button id="newProblemButton">Neue Aufgabe</button>
+    </div>
+    <div id="result"></div>
+
+    <script>
+        let currentNumber = 0;
+        let correctFactors = [];
+        let maxNumber = 100;
+        let isReordering = false;
+
+        function generateNumber(max) {
+            return Math.floor(Math.random() * (max - 2)) + 2;
+        }
+
+        function getPrimeFactors(num) {
+            const factors = [];
+            let divisor = 2;
+            while (num > 1) {
+                if (num % divisor === 0) {
+                    factors.push(divisor);
+                    num /= divisor;
+                } else {
+                    divisor++;
+                }
+            }
+            return factors;
+        }
+
+        function getInputWidth(factor) {
+            return factor.toString().length;
+        }
+
+        function generateNewProblem() {
+            currentNumber = generateNumber(maxNumber);
+            correctFactors = getPrimeFactors(currentNumber);
+            document.getElementById('currentNumber').textContent = currentNumber;
+            
+            const inputsContainer = document.getElementById('inputsContainer');
+            inputsContainer.innerHTML = '';
+            for (let i = 0; i < correctFactors.length; i++) {
+                if (i > 0) {
+                    const multiplyDot = document.createElement('span');
+                    multiplyDot.textContent = '·';
+                    multiplyDot.className = 'multiply-dot';
+                    inputsContainer.appendChild(multiplyDot);
+                }
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.inputMode = 'numeric';
+                input.pattern = '[0-9]*';
+                input.required = true;
+                input.dataset.width = getInputWidth(correctFactors[i]);
+                input.addEventListener('input', handleInput);
+                input.addEventListener('keydown', handleKeyDown);
+                inputsContainer.appendChild(input);
+            }
+            
+            document.getElementById('result').textContent = '';
+            document.getElementById('result').style.backgroundColor = '';
+            document.getElementById('reorderContainer').style.display = 'none';
+            isReordering = false;
+        }
+
+        function handleInput(event) {
+            const input = event.target;
+            input.value = input.value.replace(/[^0-9]/g, '');
+            if (input.value.length > 3) {
+                input.value = input.value.slice(0, 3);
+            }
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+
+        function checkAnswer() {
+            const inputs = isReordering ? 
+                document.querySelectorAll('#reorderContainer input') :
+                document.querySelectorAll('#inputsContainer input');
+            const userFactors = Array.from(inputs).map(input => parseInt(input.value)).filter(Boolean);
+            
+            if (userFactors.length !== correctFactors.length) {
+                alert('Bitte fülle alle Felder aus.');
+                return;
+            }
+
+            const isCorrect = JSON.stringify(userFactors) === JSON.stringify(correctFactors);
+            const factorsMatch = areFactorsEqual(userFactors, correctFactors);
+            const resultDiv = document.getElementById('result');
+            
+            if (isCorrect) {
+                resultDiv.textContent = `Richtig! Gut gemacht! Die korrekte Lösung ist: ${correctFactors.join(' · ')}`;
+                resultDiv.style.backgroundColor = '#1e4620';
+                document.getElementById('reorderContainer').style.display = 'none';
+                isReordering = false;
+            } else if (factorsMatch && !isReordering) {
+                resultDiv.textContent = 'Die Faktoren sind korrekt, aber die Reihenfolge ist nicht optimal. Bitte ordne sie neu.';
+                resultDiv.style.backgroundColor = '#4c1d1d';
+                showReorderInputs();
+            } else {
+                resultDiv.textContent = `Leider falsch. Bitte versuche es erneut.`;
+                resultDiv.style.backgroundColor = '#4c1d1d';
+            }
+        }
+
+        function showReorderInputs() {
+            const reorderContainer = document.getElementById('reorderContainer');
+            reorderContainer.innerHTML = '<span class="equals-sign">=</span>';
+
+            for (let i = 0; i < correctFactors.length; i++) {
+                if (i > 0) {
+                    const multiplyDot = document.createElement('span');
+                    multiplyDot.textContent = '·';
+                    multiplyDot.className = 'multiply-dot';
+                    reorderContainer.appendChild(multiplyDot);
+                }
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.inputMode = 'numeric';
+                input.pattern = '[0-9]*';
+                input.required = true;
+                input.dataset.width = getInputWidth(correctFactors[i]);
+                input.addEventListener('input', handleInput);
+                input.addEventListener('keydown', handleKeyDown);
+                reorderContainer.appendChild(input);
+            }
+
+            reorderContainer.style.display = 'flex';
+            isReordering = true;
+        }
+
+        function areFactorsEqual(factors1, factors2) {
+            if (factors1.length !== factors2.length) return false;
+            
+            const sortedFactors1 = factors1.slice().sort((a, b) => a - b);
+            const sortedFactors2 = factors2.slice().sort((a, b) => a - b);
+            
+            return JSON.stringify(sortedFactors1) === JSON.stringify(sortedFactors2);
+        }
+
+        function setMaxNumber(max) {
+            maxNumber = max;
+            document.getElementById('button100').classList.toggle('active', max === 100);
+            document.getElementById('button100').classList.toggle('inactive', max !== 100);
+            document.getElementById('button500').classList.toggle('active', max === 500);
+            document.getElementById('button500').classList.toggle('inactive', max !== 500);
+            generateNewProblem();
+        }
+
+        document.getElementById('button100').addEventListener('click', () => setMaxNumber(100));
+        document.getElementById('button500').addEventListener('click', () => setMaxNumber(500));
+        document.getElementById('newProblemButton').addEventListener('click', generateNewProblem);
+        document.getElementById('checkButton').addEventListener('click', checkAnswer);
+
+        generateNewProblem();
+    </script>
+</body>
+</html>

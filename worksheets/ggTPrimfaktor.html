@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ggT-Übung mit Primfaktorzerlegung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container {
+            text-align: left;
+            background-color: #16213e;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        .aufgabe {
+            margin-bottom: 20px;
+        }
+        .grosse-aufgabe {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #8ecae6;
+        }
+        .primfaktor-reihe {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .zahl-label {
+            width: 120px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .primfaktor-input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            margin: 0 5px 5px 0;
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+            border: 2px solid #4a5568;
+            border-radius: 5px;
+        }
+        #ueberpruefen, #neueAufgabe {
+            background-color: #4a5568;
+            color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin: 10px 5px;
+        }
+        #ueberpruefen:hover, #neueAufgabe:hover {
+            background-color: #5a6678;
+        }
+        h1 {
+            color: #8ecae6;
+            text-align: center;
+        }
+        #ggtEingabe {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+            border: 2px solid #4a5568;
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            width: 100px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #ergebnis {
+            margin-top: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+        .ggt-eingabe-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+        .ggt-eingabe-container label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ggT-Übung mit Primfaktorzerlegung</h1>
+        <div class="grosse-aufgabe">
+            Bestimme den ggT von <span id="zahl1">28</span> und <span id="zahl2">60</span>
+        </div>
+        <div class="aufgabe">
+            <div id="primfaktorReihe1" class="primfaktor-reihe">
+                <span class="zahl-label"><span id="zahl1Label">28</span> =</span>
+            </div>
+            <div id="primfaktorReihe2" class="primfaktor-reihe">
+                <span class="zahl-label"><span id="zahl2Label">60</span> =</span>
+            </div>
+        </div>
+        <div class="ggt-eingabe-container">
+            <label for="ggtEingabe">Dein ggT als Primfaktorzerlegung:</label>
+            <input type="text" id="ggtEingabe" placeholder="z.B. 2 2">
+        </div>
+        <div class="button-container">
+            <button id="ueberpruefen">Überprüfen</button>
+            <button id="neueAufgabe">Neue Aufgabe</button>
+        </div>
+        <p id="ergebnis"></p>
+    </div>
+
+    <script>
+        const zahl1 = document.getElementById('zahl1');
+        const zahl2 = document.getElementById('zahl2');
+        const zahl1Label = document.getElementById('zahl1Label');
+        const zahl2Label = document.getElementById('zahl2Label');
+        const primfaktorReihe1 = document.getElementById('primfaktorReihe1');
+        const primfaktorReihe2 = document.getElementById('primfaktorReihe2');
+        const ggtEingabe = document.getElementById('ggtEingabe');
+        const ueberpruefen = document.getElementById('ueberpruefen');
+        const neueAufgabe = document.getElementById('neueAufgabe');
+        const ergebnis = document.getElementById('ergebnis');
+
+        function primfaktorzerlegung(n) {
+            let faktoren = [];
+            let teiler = 2;
+            while (n > 1) {
+                if (n % teiler === 0) {
+                    faktoren.push(teiler);
+                    n /= teiler;
+                } else {
+                    teiler++;
+                }
+            }
+            return faktoren;
+        }
+
+        function generiereEingabefelder(zahl, reihe) {
+            const faktoren = primfaktorzerlegung(zahl);
+            reihe.innerHTML = `<span class="zahl-label">${zahl} =</span>`;
+            faktoren.forEach(() => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'primfaktor-input';
+                input.dataset.zahl = zahl;
+                reihe.appendChild(input);
+            });
+        }
+
+        function generiereAufgabe() {
+            const num1 = Math.floor(Math.random() * 98) + 2; // 2 bis 99
+            const num2 = Math.floor(Math.random() * 98) + 2; // 2 bis 99
+            zahl1.textContent = num1;
+            zahl2.textContent = num2;
+            zahl1Label.textContent = num1;
+            zahl2Label.textContent = num2;
+            
+            generiereEingabefelder(num1, primfaktorReihe1);
+            generiereEingabefelder(num2, primfaktorReihe2);
+            
+            ggtEingabe.value = '';
+            ergebnis.textContent = '';
+        }
+
+        function sindPrimfaktorenKorrekt(zahl, eingegebeneFaktoren) {
+            const korrekteFaktoren = primfaktorzerlegung(zahl);
+            return eingegebeneFaktoren.length === korrekteFaktoren.length &&
+                   eingegebeneFaktoren.every((faktor, index) => faktor === korrekteFaktoren[index]);
+        }
+
+        function berechneGGT(a, b) {
+            const faktorenA = primfaktorzerlegung(a);
+            const faktorenB = primfaktorzerlegung(b);
+            let ggtFaktoren = [];
+            let i = 0, j = 0;
+
+            while (i < faktorenA.length && j < faktorenB.length) {
+                if (faktorenA[i] === faktorenB[j]) {
+                    ggtFaktoren.push(faktorenA[i]);
+                    i++;
+                    j++;
+                } else if (faktorenA[i] < faktorenB[j]) {
+                    i++;
+                } else {
+                    j++;
+                }
+            }
+
+            return ggtFaktoren;
+        }
+
+        function ueberpruefeEingaben() {
+            const num1 = parseInt(zahl1.textContent);
+            const num2 = parseInt(zahl2.textContent);
+            const faktoren1 = Array.from(primfaktorReihe1.querySelectorAll('.primfaktor-input'))
+                                   .map(input => parseInt(input.value))
+                                   .filter(value => !isNaN(value));
+            const faktoren2 = Array.from(primfaktorReihe2.querySelectorAll('.primfaktor-input'))
+                                   .map(input => parseInt(input.value))
+                                   .filter(value => !isNaN(value));
+            const eingabeGGT = ggtEingabe.value.split(' ').map(Number).filter(value => !isNaN(value));
+
+            const faktoren1Korrekt = sindPrimfaktorenKorrekt(num1, faktoren1);
+            const faktoren2Korrekt = sindPrimfaktorenKorrekt(num2, faktoren2);
+            const korrekterGGT = berechneGGT(num1, num2);
+            const ggtKorrekt = JSON.stringify(eingabeGGT) === JSON.stringify(korrekterGGT);
+
+            let nachricht = "";
+            if (faktoren1Korrekt && faktoren2Korrekt && ggtKorrekt) {
+                nachricht = "Alle Eingaben sind korrekt! Gut gemacht!";
+                ergebnis.style.color = "#4CAF50";
+            } else {
+                nachricht = "Es gibt noch Fehler:\n";
+                if (!faktoren1Korrekt) nachricht += `- Die Primfaktoren für ${num1} sind nicht korrekt.\n`;
+                if (!faktoren2Korrekt) nachricht += `- Die Primfaktoren für ${num2} sind nicht korrekt.\n`;
+                if (!ggtKorrekt) nachricht += `- Der ggT ist nicht korrekt. Korrekt wäre: ${korrekterGGT.join(' ')}\n`;
+                ergebnis.style.color = "#FF5252";
+            }
+            ergebnis.textContent = nachricht;
+        }
+
+        ueberpruefen.addEventListener('click', ueberpruefeEingaben);
+        neueAufgabe.addEventListener('click', generiereAufgabe);
+
+        // Initiale Aufgabe generieren
+        generiereAufgabe();
+    </script>
+</body>
+</html>

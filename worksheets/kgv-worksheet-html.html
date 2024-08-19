@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGV Arbeitsblatt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #2d3748;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 48rem;
+            width: 100%;
+        }
+        h1 {
+            color: #90cdf4;
+            margin-bottom: 1rem;
+        }
+        label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            color: #90cdf4;
+        }
+        input {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            border: 1px solid #718096;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            width: 3rem;
+            text-align: center;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .kgv-container {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        button {
+            background-color: #4299e1;
+            color: #fff;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            margin-right: 1rem;
+            display: inline-flex;
+            align-items: center;
+            height: 2.5rem;
+        }
+        button:hover {
+            background-color: #3182ce;
+        }
+        .alert {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+        .alert-success {
+            background-color: #2f855a;
+        }
+        .alert-error {
+            background-color: #9b2c2c;
+        }
+        .alert-icon {
+            margin-right: 0.5rem;
+        }
+        #kgvAntwort {
+            width: 5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KGV Arbeitsblatt</h1>
+        <p id="aufgabe"></p>
+        <div>
+            <label id="reihe1Label"></label>
+            <div id="reihe1Inputs" class="row"></div>
+        </div>
+        <div>
+            <label id="reihe2Label"></label>
+            <div id="reihe2Inputs" class="row"></div>
+        </div>
+        <div class="kgv-container">
+            <label id="kgvLabel"></label>
+            <input type="text" id="kgvAntwort">
+        </div>
+        <div class="button-container">
+            <button onclick="antwortPruefen()">Antwort prüfen</button>
+            <button onclick="generiereNeueAufgabe()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+                    <path d="M3 2v6h6"></path>
+                    <path d="M21 12A9 9 0 0 0 6 5.3L3 8"></path>
+                    <path d="M21 22v-6h-6"></path>
+                    <path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path>
+                </svg>
+                Neue Aufgabe
+            </button>
+        </div>
+        <div id="feedback" class="alert" style="display: none;"></div>
+    </div>
+
+    <script>
+        let zahl1, zahl2, korrekterKGV, korrekteReihe1, korrekteReihe2;
+
+        function berechneKGV(a, b) {
+            const ggT = (x, y) => y === 0 ? x : ggT(y, x % y);
+            return (a * b) / ggT(a, b);
+        }
+
+        function generiereReihe(zahl, kgv) {
+            let reihe = [];
+            for (let i = zahl; i <= kgv; i += zahl) {
+                reihe.push(i);
+            }
+            return reihe;
+        }
+
+        function generiereNeueAufgabe() {
+            zahl1 = Math.floor(Math.random() * 10) + 2;
+            zahl2 = Math.floor(Math.random() * 10) + 2;
+            korrekterKGV = berechneKGV(zahl1, zahl2);
+            korrekteReihe1 = generiereReihe(zahl1, korrekterKGV);
+            korrekteReihe2 = generiereReihe(zahl2, korrekterKGV);
+
+            document.getElementById('aufgabe').textContent = `Finde das KGV (kleinstes gemeinsames Vielfaches) von ${zahl1} und ${zahl2}:`;
+            document.getElementById('kgvLabel').textContent = `KGV(${zahl1}, ${zahl2}) =`;
+            document.getElementById('kgvAntwort').value = '';
+            document.getElementById('reihe1Label').textContent = `${zahl1}er Reihe:`;
+            document.getElementById('reihe2Label').textContent = `${zahl2}er Reihe:`;
+
+            const reihe1Inputs = document.getElementById('reihe1Inputs');
+            const reihe2Inputs = document.getElementById('reihe2Inputs');
+            reihe1Inputs.innerHTML = '';
+            reihe2Inputs.innerHTML = '';
+
+            for (let i = 0; i < korrekteReihe1.length; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                reihe1Inputs.appendChild(input);
+            }
+
+            for (let i = 0; i < korrekteReihe2.length; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                reihe2Inputs.appendChild(input);
+            }
+
+            document.getElementById('feedback').style.display = 'none';
+        }
+
+        function antwortPruefen() {
+            const kgvAntwort = parseInt(document.getElementById('kgvAntwort').value);
+            const reihe1Inputs = document.getElementById('reihe1Inputs').getElementsByTagName('input');
+            const reihe2Inputs = document.getElementById('reihe2Inputs').getElementsByTagName('input');
+
+            const reihe1Korrekt = Array.from(reihe1Inputs).every((input, idx) => parseInt(input.value) === korrekteReihe1[idx]);
+            const reihe2Korrekt = Array.from(reihe2Inputs).every((input, idx) => parseInt(input.value) === korrekteReihe2[idx]);
+
+            const istKorrekt = kgvAntwort === korrekterKGV && reihe1Korrekt && reihe2Korrekt;
+
+            const feedback = document.getElementById('feedback');
+            feedback.className = istKorrekt ? 'alert alert-success' : 'alert alert-error';
+            feedback.innerHTML = istKorrekt
+                ? '<span class="alert-icon">✓</span> Richtig! Sehr gut gemacht!'
+                : '<span class="alert-icon">✗</span> Nicht ganz richtig. Versuche es noch einmal!';
+            feedback.style.display = 'flex';
+        }
+
+        generiereNeueAufgabe();
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primzahlen-Entdecker (Dark Mode)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #4a90e2;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        .number {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            color: #e0e0e0;
+        }
+        .prime {
+            background-color: #4a90e2;
+            color: #121212;
+        }
+        .correct-prime {
+            background-color: #6aB0ff;
+            color: #121212;
+        }
+        .missed-prime {
+            background-color: #4a4a4a;
+            color: #e0e0e0;
+        }
+        .wrong-prime {
+            background-color: #e74c3c;
+            color: #121212;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: #121212;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3a7bc8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Primzahlen-Entdecker</h1>
+    <div id="grid"></div>
+    <button id="check">Überprüfen</button>
+    <button id="reset">Zurücksetzen</button>
+
+    <script>
+        const grid = document.getElementById('grid');
+        const checkButton = document.getElementById('check');
+        const resetButton = document.getElementById('reset');
+        const primes = new Set();
+
+        function isPrime(num) {
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        function createGrid() {
+            for (let i = 1; i <= 100; i++) {
+                const div = document.createElement('div');
+                div.className = 'number';
+                div.textContent = i;
+                div.addEventListener('click', () => {
+                    div.classList.toggle('prime');
+                });
+                grid.appendChild(div);
+                if (isPrime(i)) primes.add(i);
+            }
+        }
+
+        function highlightPrimes() {
+            const numbers = document.querySelectorAll('.number');
+            numbers.forEach(num => {
+                const value = parseInt(num.textContent);
+                if (num.classList.contains('prime') && primes.has(value)) {
+                    num.classList.add('correct-prime');
+                } else if (!num.classList.contains('prime') && primes.has(value)) {
+                    num.classList.add('missed-prime');
+                } else if (num.classList.contains('prime') && !primes.has(value)) {
+                    num.classList.add('wrong-prime');
+                }
+            });
+        }
+
+        function resetHighlight() {
+            const numbers = document.querySelectorAll('.number');
+            numbers.forEach(num => {
+                num.classList.remove('correct-prime', 'missed-prime', 'wrong-prime');
+            });
+        }
+
+        function reset() {
+            document.querySelectorAll('.number').forEach(el => {
+                el.classList.remove('prime', 'correct-prime', 'missed-prime', 'wrong-prime');
+            });
+        }
+
+        createGrid();
+        checkButton.addEventListener('mousedown', highlightPrimes);
+        checkButton.addEventListener('mouseup', resetHighlight);
+        checkButton.addEventListener('mouseleave', resetHighlight);
+        resetButton.addEventListener('click', reset);
+    </script>
+</body>
+</html>

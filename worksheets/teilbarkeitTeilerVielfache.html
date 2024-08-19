@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erweiterte Teilbarkeit, Teiler und Vielfache Übung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+        }
+        h1, h2 {
+            color: #4a80f0;
+        }
+        input, button {
+            font-size: 16px;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #16213e;
+            color: #e0e0e0;
+            border: 1px solid #4a80f0;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="text"] {
+            text-align: center;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4a80f0;
+            color: #ffffff;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3a70e0;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .button-group button {
+            width: 48%;
+            margin-bottom: 10px;
+        }
+        #result {
+            margin-top: 20px;
+            background-color: #16213e;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .divisible, .factor, .multiple {
+            color: #4af0a0;
+        }
+        .not-divisible {
+            color: #f04a4a;
+        }
+        .calculation {
+            font-style: italic;
+            color: #a0a0a0;
+            margin-left: 10px;
+        }
+        .factor-list, .multiple-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Erweiterte Teilbarkeit, Teiler und Vielfache Übung</h1>
+    <p>Gib eine Zahl ein und wähle dann eine Operation:</p>
+    <input type="text" id="numberInput" placeholder="Zahl eingeben" inputmode="numeric" pattern="[0-9]*">
+    <div class="button-group">
+        <button onclick="checkDivisibility([2,4,5,10])">Teilbarkeit 2,4,5,10</button>
+        <button onclick="checkDivisibility([3,9])">Teilbarkeit 3,9</button>
+        <button onclick="findFactors()">Teiler finden</button>
+        <button onclick="findMultiples()">Vielfache finden</button>
+    </div>
+    <div id="result"></div>
+
+    <script>
+        const numberInput = document.getElementById('numberInput');
+        const resultDiv = document.getElementById('result');
+
+        function checkDivisibility(rules) {
+            const number = parseInt(numberInput.value);
+            
+            if (isNaN(number) || number < 1) {
+                resultDiv.innerHTML = 'Bitte gib eine gültige positive ganze Zahl ein.';
+                return;
+            }
+
+            let result = `<h2>Teilbarkeit für ${number}:</h2>`;
+            rules.forEach(rule => {
+                result += createDivisibilityLine(rule, isDivisibleBy(number, rule), number);
+            });
+
+            resultDiv.innerHTML = result;
+        }
+
+        function createDivisibilityLine(divisor, isDivisible, number) {
+            const className = isDivisible ? 'divisible' : 'not-divisible';
+            const text = isDivisible ? 'Ja' : 'Nein';
+            let calculation = '';
+            if (isDivisible) {
+                const quotient = Math.floor(number / divisor);
+                calculation = `<span class="calculation">${number} = ${divisor} · ${quotient}</span>`;
+            }
+            return `<p>Teilbar durch ${divisor}: <span class="${className}">${text}</span>${calculation}</p>`;
+        }
+
+        function isDivisibleBy(number, divisor) {
+            if (divisor === 3 || divisor === 9) {
+                const digitSum = String(number).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+                return divisor === 3 ? digitSum % 3 === 0 : digitSum % 9 === 0;
+            }
+            return number % divisor === 0;
+        }
+
+        function findFactors() {
+            const number = parseInt(numberInput.value);
+            
+            if (isNaN(number) || number < 1) {
+                resultDiv.innerHTML = 'Bitte gib eine gültige positive ganze Zahl ein.';
+                return;
+            }
+
+            const factors = [];
+            for (let i = 1; i <= Math.sqrt(number); i++) {
+                if (number % i === 0) {
+                    factors.push(i);
+                    if (i !== number / i) factors.push(number / i);
+                }
+            }
+            factors.sort((a, b) => a - b);
+
+            let result = `<h2>Teiler von ${number}:</h2>`;
+            result += '<div class="factor-list">';
+            factors.forEach(factor => {
+                result += `<p class="factor">${factor} <span class="calculation">(${number} = ${factor} · ${number/factor})</span></p>`;
+            });
+            result += '</div>';
+            resultDiv.innerHTML = result;
+        }
+
+        function findMultiples() {
+            const number = parseInt(numberInput.value);
+            
+            if (isNaN(number) || number < 1) {
+                resultDiv.innerHTML = 'Bitte gib eine gültige positive ganze Zahl ein.';
+                return;
+            }
+
+            let result = `<h2>Die ersten 10 Vielfachen von ${number}:</h2>`;
+            result += '<div class="multiple-list">';
+            for (let i = 1; i <= 10; i++) {
+                const multiple = number * i;
+                result += `<p class="multiple">${multiple} <span class="calculation">(${number} · ${i} = ${multiple})</span></p>`;
+            }
+            result += '</div>';
+            resultDiv.innerHTML = result;
+        }
+
+        // Nur Zahlen erlauben
+        numberInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Event Listener für Tastatureingabe
+        numberInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkDivisibility([2,4,5,10]); // Standard: Prüfe 2,4,5,10
+            }
+        });
+    </script>
+</body>
+</html>

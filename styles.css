@@ -47,23 +47,50 @@ main {
   background-color: var(--bg-color);
 }
 
-ul {
+main h2 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+main ul {
   list-style-type: none;
   padding: 0;
 }
 
-li {
+main li {
   margin-bottom: 0.5rem;
   padding: 0.5rem;
   background-color: var(--surface-color);
   border-radius: 4px;
 }
 
-a {
+main a {
   color: var(--secondary-color);
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-a:hover {
+main a:hover {
+  color: var(--primary-color);
   text-decoration: underline;
+}
+
+/* Zusätzliche Styles für bessere Lesbarkeit und Interaktion */
+main li:hover {
+  background-color: #2c2c2c;
+}
+
+@media (max-width: 600px) {
+  nav {
+    flex-direction: column;
+  }
+
+  nav button {
+    margin: 0.25rem 0;
+    width: 100%;
+  }
+
+  main {
+    padding: 1rem;
+  }
 }

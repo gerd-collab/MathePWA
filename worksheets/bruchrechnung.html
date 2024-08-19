@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bruchrechnung lernen mit unterteilten Kreisdiagrammen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            color: #4a90e2;
+        }
+        .fraction, .mixed-number {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 10px;
+        }
+        .numerator, .denominator {
+            display: block;
+        }
+        .fraction-line {
+            border-top: 2px solid #e0e0e0;
+            display: block;
+            margin: 5px 0;
+        }
+        .whole-number {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        input[type="number"] {
+            width: 50px;
+            height: 50px;
+            background-color: #3a3a3a;
+            color: #e0e0e0;
+            border: 1px solid #4a90e2;
+            padding: 5px;
+            margin: 5px;
+            font-size: 20px;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        button {
+            background-color: #4a90e2;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #result {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .circle-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .result-circles {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .result-circles-row {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bruchrechnung lernen mit unterteilten Kreisdiagrammen</h1>
+        <div>
+            <div class="fraction">
+                <input type="number" id="num1" min="1" max="10" value="3">
+                <span class="fraction-line"></span>
+                <input type="number" id="den1" min="1" max="10" value="4">
+            </div>
+            <span>+</span>
+            <div class="fraction">
+                <input type="number" id="num2" min="1" max="10" value="1">
+                <span class="fraction-line"></span>
+                <input type="number" id="den2" min="1" max="10" value="2">
+            </div>
+            <button onclick="calculateSum()">Berechnen</button>
+        </div>
+        <div id="result"></div>
+        <div class="circle-container">
+            <div>
+                <div id="circle1" class="circle"></div>
+                <p>Bruch 1</p>
+            </div>
+            <div>
+                <div id="circle2" class="circle"></div>
+                <p>Bruch 2</p>
+            </div>
+            <div class="result-circles">
+                <div class="result-circles-row">
+                    <div id="circleResult1" class="circle"></div>
+                    <div id="circleResult2" class="circle"></div>
+                </div>
+                <p>Ergebnis</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateSum() {
+            const num1 = parseInt(document.getElementById('num1').value);
+            const den1 = parseInt(document.getElementById('den1').value);
+            const num2 = parseInt(document.getElementById('num2').value);
+            const den2 = parseInt(document.getElementById('den2').value);
+
+            const lcm = findLCM(den1, den2);
+            const resultNum = (num1 * (lcm / den1)) + (num2 * (lcm / den2));
+            const resultDen = lcm;
+
+            const gcd = findGCD(resultNum, resultDen);
+            const simplifiedNum = resultNum / gcd;
+            const simplifiedDen = resultDen / gcd;
+
+            const resultElement = document.getElementById('result');
+            let resultHTML = 'Ergebnis: ';
+
+            if (simplifiedNum >= simplifiedDen) {
+                const wholeNumber = Math.floor(simplifiedNum / simplifiedDen);
+                const remainderNum = simplifiedNum % simplifiedDen;
+                if (remainderNum === 0) {
+                    resultHTML += `${wholeNumber}`;
+                } else {
+                    resultHTML += `
+                        <div class="mixed-number">
+                            <span class="whole-number">${wholeNumber}</span>
+                            <div class="fraction">
+                                <span class="numerator">${remainderNum}</span>
+                                <span class="fraction-line"></span>
+                                <span class="denominator">${simplifiedDen}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                resultHTML += `
+                    <div class="fraction">
+                        <span class="numerator">${simplifiedNum}</span>
+                        <span class="fraction-line"></span>
+                        <span class="denominator">${simplifiedDen}</span>
+                    </div>
+                `;
+            }
+
+            resultElement.innerHTML = resultHTML;
+
+            drawCircle('circle1', num1, den1, '#4a90e2');
+            drawCircle('circle2', num2, den2, '#e74c3c');
+            drawResultCircles('circleResult1', 'circleResult2', simplifiedNum, simplifiedDen, '#2ecc71');
+        }
+
+        function findGCD(a, b) {
+            return b === 0 ? a : findGCD(b, a % b);
+        }
+
+        function findLCM(a, b) {
+            return (a * b) / findGCD(a, b);
+        }
+
+        function drawCircle(elementId, num, den, color) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 100;
+            canvas.height = 100;
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0, 0, 100, 100);
+
+            // Zeichne den ganzen Kreis
+            ctx.beginPath();
+            ctx.arc(50, 50, 48, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Zeichne den gefüllten Teil
+            ctx.beginPath();
+            ctx.moveTo(50, 50);
+            ctx.arc(50, 50, 48, 0, (num / den) * 2 * Math.PI);
+            ctx.lineTo(50, 50);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            // Zeichne die weißen Unterteilungen
+            for (let i = 0; i < den; i++) {
+                ctx.beginPath();
+                ctx.moveTo(50, 50);
+                ctx.arc(50, 50, 48, (i / den) * 2 * Math.PI, ((i + 1) / den) * 2 * Math.PI);
+                ctx.lineTo(50, 50);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+            element.appendChild(canvas);
+        }
+
+        function drawResultCircles(elementId1, elementId2, num, den, baseColor) {
+            const element1 = document.getElementById(elementId1);
+            const element2 = document.getElementById(elementId2);
+
+            if (num < den) {
+                // Wenn das Ergebnis kleiner als 1 ist, zeige nur einen Kreis
+                drawCircle(elementId1, num, den, baseColor);
+                element2.style.display = 'none';
+            } else {
+                // Wenn das Ergebnis größer oder gleich 1 ist, zeige zwei Kreise
+                const wholeNumber = Math.floor(num / den);
+                const remainderNum = num % den;
+
+                // Zeichne den ersten Kreis (ganze Zahlen)
+                const canvas1 = document.createElement('canvas');
+                canvas1.width = 100;
+                canvas1.height = 100;
+                const ctx1 = canvas1.getContext('2d');
+
+                ctx1.clearRect(0, 0, 100, 100);
+                ctx1.beginPath();
+                ctx1.arc(50, 50, 48, 0, 2 * Math.PI);
+                ctx1.fillStyle = baseColor;
+                ctx1.fill();
+                ctx1.strokeStyle = '#ffffff';
+                ctx1.lineWidth = 2;
+                ctx1.stroke();
+
+                // Füge die Zahl in den Kreis ein
+                ctx1.fillStyle = '#ffffff';
+                ctx1.font = 'bold 40px Arial';
+                ctx1.textAlign = 'center';
+                ctx1.textBaseline = 'middle';
+                ctx1.fillText(wholeNumber.toString(), 50, 50);
+
+                element1.innerHTML = '';
+                element1.appendChild(canvas1);
+
+                // Zeichne den zweiten Kreis (Bruchteile)
+                drawCircle(elementId2, remainderNum, den, baseColor);
+                element2.style.display = 'inline-block';
+            }
+        }
+
+        // Initial zeichnen
+        calculateSum();
+    </script>
+</body>
+</html>
