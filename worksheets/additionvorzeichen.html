@@ -51,6 +51,12 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
         .exercise {
             font-size: 24px;
             margin-bottom: 20px;
@@ -98,12 +104,6 @@
         .result {
             font-size: 18px;
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .score {
-            text-align: center;
-            font-size: 18px;
             margin-bottom: 20px;
         }
 
@@ -171,6 +171,15 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
+        // Funktion zum Formatieren einer Zahl mit Vorzeichen und Klammern, wenn zwei Vorzeichen aufeinander treffen
+        function formatNumber(number) {
+            if (number >= 0) {
+                return `(+${number})`;
+            } else {
+                return `(${number})`;
+            }
+        }
+
         // Funktion zum Generieren einer neuen Übung
         function generateExercise() {
             const operators = ['+', '-'];
@@ -178,14 +187,26 @@
             const zahl1 = getRandomNumber(-20, 20);
             const zahl2 = getRandomNumber(-20, 20);
 
+            // Berechnung der Lösung
+            let solution;
+            if (operator === '+') {
+                solution = zahl1 + zahl2;
+            } else {
+                solution = zahl1 - zahl2;
+            }
+
             currentExercise = {
                 zahl1: zahl1,
                 operator: operator,
                 zahl2: zahl2,
-                solution: operator === '+' ? zahl1 + zahl2 : zahl1 - zahl2
+                solution: solution
             };
 
-            document.getElementById('exercise').textContent = `${zahl1} ${operator} ${zahl2} = ?`;
+            // Formatierte Anzeige der Zahlen mit Klammern, wenn Vorzeichen aufeinander treffen
+            const formattedZahl1 = formatNumber(zahl1);
+            const formattedZahl2 = formatNumber(zahl2);
+
+            document.getElementById('exercise').textContent = `${formattedZahl1} ${operator} ${formattedZahl2} = ?`;
             document.getElementById('userAnswer').value = '';
             document.getElementById('result').textContent = '';
         }
