@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taschenrechner</title>
+    <style>
+        /* Dark Mode Styles */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .calculator {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 320px;
+        }
+
+        .display {
+            width: 100%;
+            height: 60px;
+            background-color: #333;
+            color: #fff;
+            font-size: 2em;
+            text-align: right;
+            padding: 10px;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+        }
+
+        .digits {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            flex: 3;
+        }
+
+        .digits button {
+            width: 100%;
+            height: 60px;
+            font-size: 1.5em;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .digits button:hover {
+            background-color: #555;
+        }
+
+        .digits button:active {
+            background-color: #666;
+        }
+
+        .operations {
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+            flex: 1;
+        }
+
+        .operations button {
+            width: 100%;
+            height: 60px;
+            font-size: 1.5em;
+            background-color: #ff9500;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .operations button:last-child {
+            margin-bottom: 0;
+        }
+
+        .operations button:hover {
+            background-color: #e08e00;
+        }
+
+        .operations button:active {
+            background-color: #c07700;
+        }
+
+        /* Responsive Anpassung */
+        @media (max-width: 400px) {
+            .calculator {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="display" id="display" value="0" readonly>
+        <div class="buttons">
+            <div class="digits">
+                <button onclick="appendToDisplay('7')">7</button>
+                <button onclick="appendToDisplay('8')">8</button>
+                <button onclick="appendToDisplay('9')">9</button>
+                <button onclick="appendToDisplay('4')">4</button>
+                <button onclick="appendToDisplay('5')">5</button>
+                <button onclick="appendToDisplay('6')">6</button>
+                <button onclick="appendToDisplay('1')">1</button>
+                <button onclick="appendToDisplay('2')">2</button>
+                <button onclick="appendToDisplay('3')">3</button>
+                <button onclick="appendToDisplay('.')">.</button>
+                <button onclick="appendToDisplay('0')">0</button>
+                <button onclick="clearDisplay()">C</button>
+            </div>
+            <div class="operations">
+                <button onclick="appendToDisplay('/')">÷</button>
+                <button onclick="appendToDisplay('*')">×</button>
+                <button onclick="appendToDisplay('-')">−</button>
+                <button onclick="appendToDisplay('+')">+</button>
+                <button onclick="calculate()">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appendToDisplay(value) {
+            const display = document.getElementById('display');
+            // Wenn die aktuelle Anzeige '0' ist, ersetzen wir sie durch den neuen Wert
+            if (display.value === '0' && value !== '.') {
+                display.value = value;
+            } else {
+                display.value += value;
+            }
+        }
+
+        function calculate() {
+            let expression = document.getElementById('display').value;
+            try {
+                // Ersetze das Divisionszeichen für die Berechnung
+                expression = expression.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-');
+                let result = eval(expression);
+                document.getElementById('display').value = result;
+            } catch (error) {
+                alert('Ungültiger Ausdruck');
+            }
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '0';
+        }
+    </script>
+</body>
+</html>
