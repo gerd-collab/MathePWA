@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zahlenstrahl Übung</title>
+    <style>
+        /* Grundlegendes Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+        }
+
+        /* Zurück Button Styling */
+        .back-button-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .back-button-container button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .back-button-container button:hover {
+            background-color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 60px 0 20px 0; /* Angepasst, um Platz für den Zurück-Button zu schaffen */
+        }
+
+        /* Buttons Styling */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: #45a049;
+        }
+
+        /* Zahlenstrahl Styling */
+        .number-line-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            height: 150px;
+        }
+
+        .number-line {
+            position: absolute;
+            top: 60%;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background-color: #f0f0f0;
+            transform: translateY(-50%);
+        }
+
+        /* Pfeilspitzen */
+        .arrow-head-left, .arrow-head-right {
+            position: absolute;
+            top: 60%;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+
+        .arrow-head-left {
+            left: 5%;
+            border-right: 10px solid #f0f0f0;
+            transform: translateY(-50%);
+        }
+
+        .arrow-head-right {
+            right: 5%;
+            border-left: 10px solid #f0f0f0;
+            transform: translateY(-50%);
+        }
+
+        /* Tick Marks und Zahlen */
+        .tick {
+            position: absolute;
+            top: 60%;
+            width: 2px;
+            height: 10px;
+            background-color: #f0f0f0;
+            transform: translateY(-50%);
+        }
+
+        .number {
+            position: absolute;
+            top: 70%;
+            transform: translateX(-50%);
+            font-size: 14px;
+        }
+
+        /* Vektor Container */
+        .vector-container {
+            position: absolute;
+            top: 25%; /* Position oberhalb des Zahlenstrahls */
+            /* left wird dynamisch über JavaScript gesetzt */
+            display: flex;
+            align-items: center;
+            z-index: 1;
+        }
+
+        /* Vektor Linie */
+        .vector-line {
+            height: 2px;
+            background-color: white;
+        }
+
+        /* Arrowhead */
+        .arrow-head {
+            width: 0;
+            height: 0;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-left: 10px solid white; /* Standard nach rechts */
+            margin-left: 0; /* Dynamisch gesetzt */
+        }
+
+        /* Arrowhead nach links */
+        .arrow-head.left {
+            border-left: 0;
+            border-right: 10px solid white;
+            margin-left: -10px; /* Überlappt mit der Linie */
+        }
+
+        /* Pfeil für Bewegung */
+        .movement-arrow {
+            position: absolute;
+            top: 60%;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #4CAF50;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        /* Startpunkt und Ergebnis Punkt */
+        .dot {
+            position: absolute;
+            top: 60%;
+            width: 14px;
+            height: 14px;
+            background-color: #FF9800;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .result-dot {
+            background-color: #2196F3;
+        }
+
+        /* Formular für Eingaben */
+        .input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-container input {
+            padding: 10px;
+            width: 200px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #333;
+            color: #f0f0f0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .input-container button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .input-container button:hover {
+            background-color: #007B9E;
+        }
+
+        /* Gleichheitszeichen Styling */
+        .input-container .equals {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Feedback Anzeige */
+        .feedback {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Beschriftung über dem Vektor */
+        .vector-label {
+            position: absolute;
+            bottom: 100%; /* Direkt über dem Vektor */
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 14px;
+            color: #f0f0f0;
+            white-space: nowrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .controls, .input-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .input-container input, .input-container button {
+                width: 80%;
+            }
+
+            .back-button-container {
+                position: static;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Zurück Button -->
+    <div class="back-button-container">
+        <button onclick="window.location.href='../index.html'">Zurück</button>
+    </div>
+
+    <h1>Zahlenstrahl Übung</h1>
+
+    <div class="controls">
+        <button id="newTaskButton">Neue Aufgabe</button>
+        <button id="solutionButton">Lösung</button>
+    </div>
+
+    <div class="number-line-container">
+        <div class="number-line"></div>
+        <div class="arrow-head-left"></div>
+        <div class="arrow-head-right"></div>
+        <!-- Vektor als Linie und Arrowhead -->
+        <div class="vector-container" id="vectorContainer"></div>
+        <!-- Startpunkt -->
+        <div class="dot" id="startDot"></div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="calculationInput" placeholder="Rechnung (z.B. 3 + 2)">
+        <span class="equals">=</span>
+        <input type="number" id="resultInput" placeholder="Ergebnis (z.B. 5)" min="-10" max="10">
+        <button id="checkButton">Überprüfen</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <script>
+        // JavaScript Code
+
+        // Initialisierung
+        const numberLineContainer = document.querySelector('.number-line-container');
+        const vectorContainer = document.getElementById('vectorContainer');
+        const startDot = document.getElementById('startDot');
+        const newTaskButton = document.getElementById('newTaskButton');
+        const solutionButton = document.getElementById('solutionButton');
+        const checkButton = document.getElementById('checkButton');
+        const calculationInput = document.getElementById('calculationInput');
+        const resultInput = document.getElementById('resultInput');
+        const feedback = document.getElementById('feedback');
+
+        let currentTask = {
+            start: 0,
+            vector: 0,
+            operation: '+',
+            result: 0
+        };
+
+        // Funktion zum Generieren der Tick Marks und Zahlen
+        function generateNumberLine() {
+            for(let i = -10; i <= 10; i++) {
+                // Skip Tick Marks an den äußersten Enden (-10 und +10)
+                if(i === -10 || i === 10) continue;
+
+                // Tick Marks
+                const tick = document.createElement('div');
+                tick.classList.add('tick');
+                const position = ((i + 10) / 20) * 90; // Prozentual von links (5% Padding auf beiden Seiten)
+                tick.style.left = `calc(5% + ${position}%)`;
+                numberLineContainer.appendChild(tick);
+
+                // Zahlen
+                const number = document.createElement('div');
+                number.classList.add('number');
+                number.innerText = i;
+                number.style.left = `calc(5% + ${position}%)`;
+                numberLineContainer.appendChild(number);
+            }
+        }
+
+        // Funktion zum Generieren einer neuen Aufgabe
+        function generateNewTask() {
+            // Lösche vorherige Bewegungen und Punkte
+            clearResults();
+
+            // Zufälliger Startpunkt (-10 bis +10)
+            const start = getRandomInt(-10, 10);
+
+            // Zufälliger Vektor (+1 bis +5 oder -1 bis -5)
+            let vector = 0;
+            while (vector === 0) {
+                vector = getRandomInt(-5, 5);
+            }
+            const operation = vector > 0 ? '+' : '-';
+            const absVector = Math.abs(vector);
+
+            // Berechne das Ergebnis
+            const result = start + vector;
+
+            // Update aktueller Task
+            currentTask = {
+                start: start,
+                vector: vector,
+                operation: operation,
+                result: result
+            };
+
+            // Positioniere den Startpunkt
+            const startPosition = ((start + 10) / 20) * 90 + 5; // Prozentual von links (5% Padding)
+            startDot.style.left = `${startPosition}%`;
+
+            // Zeichne den Vektor
+            drawVector(startPosition, vector);
+
+            // Leere Eingaben und Feedback
+            calculationInput.value = '';
+            resultInput.value = '';
+            feedback.innerText = '';
+        }
+
+        // Funktion zum Zeichnen des Vektors
+        function drawVector(startPos, vector) {
+            // Definieren Sie die Breite pro Einheit (z.B. 40px pro Einheit)
+            const containerWidth = numberLineContainer.clientWidth - 10; // Abzüglich 5% Padding auf beiden Seiten
+            const totalUnits = 20; // -10 bis +10
+            const unitWidth = containerWidth / totalUnits; // Breite pro Einheit in Pixeln
+
+            // Berechne die Vektorlänge in Pixeln
+            const vectorLength = Math.abs(vector) * unitWidth;
+
+            // Erstelle die Linie
+            const vectorLine = document.createElement('div');
+            vectorLine.classList.add('vector-line');
+            vectorLine.style.width = `${vectorLength}px`;
+
+            // Erstelle die Arrowhead
+            const arrowHead = document.createElement('div');
+            arrowHead.classList.add('arrow-head');
+
+            if (vector > 0) {
+                // Pfeil nach rechts
+                arrowHead.style.borderLeftColor = 'white';
+                arrowHead.style.borderRightColor = 'transparent';
+            } else {
+                // Pfeil nach links
+                arrowHead.classList.add('left');
+                arrowHead.style.borderRightColor = 'white';
+                arrowHead.style.borderLeftColor = 'transparent';
+            }
+
+            // Erstelle die Beschriftung über dem Vektor
+            const vectorLabel = document.createElement('div');
+            vectorLabel.classList.add('vector-label');
+            vectorLabel.innerText = `${vector > 0 ? '+' : '-'} ${Math.abs(vector)}`;
+
+            // Füge Linie, Arrowhead und Label zum Vector Container hinzu
+            vectorContainer.appendChild(vectorLine);
+            vectorContainer.appendChild(arrowHead);
+            vectorContainer.appendChild(vectorLabel);
+
+            // Positioniere den Vector Container
+            vectorContainer.style.left = `${startPos}%`;
+            vectorContainer.style.transform = 'translateX(-50%)';
+
+            // Positioniere die Linie und den Arrowhead
+            // Linie: von Start nach Richtung
+            // Arrowhead: am Ende der Linie
+
+            // Sicherstellen, dass der Vector Container Flexbox verwendet
+            vectorContainer.style.display = 'flex';
+            if (vector > 0) {
+                // Flex direction row
+                vectorContainer.style.flexDirection = 'row';
+            } else {
+                // Flex direction row-reverse
+                vectorContainer.style.flexDirection = 'row-reverse';
+            }
+        }
+
+        // Funktion zum Überprüfen der Eingaben
+        function checkAnswer() {
+            const calculation = calculationInput.value.trim();
+            const result = parseInt(resultInput.value, 10);
+
+            // Validierung
+            if (calculation === '' || isNaN(result)) {
+                alert('Bitte fülle beide Felder aus.');
+                return;
+            }
+
+            // Erwartete Rechnung
+            const expectedCalculation = `${currentTask.start} ${currentTask.operation} ${Math.abs(currentTask.vector)}`;
+            const expectedResult = currentTask.result;
+
+            // Bereinigung der Eingabe
+            const normalizedCalculation = calculation.replace(/\s+/g, '');
+
+            // Erwartete berechnete Rechnung ohne Leerzeichen
+            const expectedCalculationNoSpaces = `${currentTask.start}${currentTask.operation}${Math.abs(currentTask.vector)}`;
+
+            // Vergleich der Eingaben
+            const isCalculationCorrect = normalizedCalculation === expectedCalculationNoSpaces;
+            const isResultCorrect = result === expectedResult;
+
+            if (isCalculationCorrect && isResultCorrect) {
+                feedback.style.color = '#4CAF50';
+                feedback.innerText = 'Richtig! Gut gemacht.';
+                displayMovement();
+            } else {
+                feedback.style.color = '#f44336';
+                feedback.innerText = 'Falsch. Bitte versuche es erneut.';
+                clearMovement();
+            }
+        }
+
+        // Funktion zur Anzeige der Bewegung auf dem Zahlenstrahl
+        function displayMovement() {
+            // Erstelle den Pfeil für die Bewegung
+            const movementArrow = document.createElement('div');
+            movementArrow.classList.add('movement-arrow');
+            const startPos = ((currentTask.start + 10) / 20) * 90 + 5;
+            const endPos = ((currentTask.result + 10) / 20) * 90 + 5;
+
+            const arrowLeft = Math.min(startPos, endPos);
+            const arrowWidth = Math.abs(endPos - startPos);
+
+            movementArrow.style.left = `${arrowLeft}%`;
+            movementArrow.style.width = `${arrowWidth}%`;
+
+            // Richtung des Pfeils
+            if (currentTask.vector > 0) {
+                // Pfeil nach rechts
+                movementArrow.style.transform = `translateY(-50%) rotate(0deg)`;
+                movementArrow.style.borderTopColor = '#4CAF50';
+            } else {
+                // Pfeil nach links
+                movementArrow.style.transform = `translateY(-50%) rotate(180deg)`;
+                movementArrow.style.borderTopColor = '#f44336';
+            }
+
+            numberLineContainer.appendChild(movementArrow);
+
+            // Ergebnis Punkt
+            const resultDot = document.createElement('div');
+            resultDot.classList.add('dot', 'result-dot');
+            resultDot.style.left = `${endPos}%`;
+            numberLineContainer.appendChild(resultDot);
+        }
+
+        // Funktion zum Anzeigen der Lösung
+        function showSolution() {
+            // Lösche vorherige Bewegungen und Punkte
+            clearResults();
+
+            // Zeige die korrekte Bewegung
+            displayMovement();
+
+            // Zeige die korrekte Rechnung und Ergebnis
+            calculationInput.value = `${currentTask.start} ${currentTask.operation} ${Math.abs(currentTask.vector)}`;
+            resultInput.value = `${currentTask.result}`;
+
+            // Feedback als Lösung
+            feedback.style.color = '#2196F3';
+            feedback.innerText = `Lösung: ${currentTask.start} ${currentTask.operation} ${Math.abs(currentTask.vector)} = ${currentTask.result}`;
+        }
+
+        // Funktion zum Löschen vorheriger Bewegungen und Ergebnisse
+        function clearResults() {
+            const movementArrows = document.querySelectorAll('.movement-arrow');
+            movementArrows.forEach(arrow => arrow.remove());
+
+            const resultDots = document.querySelectorAll('.result-dot');
+            resultDots.forEach(dot => dot.remove());
+
+            // Verstecke den Vektor-Pfeil beim Löschen
+            vectorContainer.innerHTML = '';
+        }
+
+        // Funktion zum Löschen nur der Bewegungen (ohne Startpunkt und Vektor)
+        function clearMovement() {
+            const movementArrows = document.querySelectorAll('.movement-arrow');
+            movementArrows.forEach(arrow => arrow.remove());
+
+            const resultDots = document.querySelectorAll('.result-dot');
+            resultDots.forEach(dot => dot.remove());
+        }
+
+        // Hilfsfunktion zur Generierung zufälliger Ganzzahlen
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Event Listener für "Neue Aufgabe"
+        newTaskButton.addEventListener('click', generateNewTask);
+
+        // Event Listener für "Überprüfen"
+        checkButton.addEventListener('click', checkAnswer);
+
+        // Event Listener für "Lösung"
+        solutionButton.addEventListener('click', showSolution);
+
+        // Initiale Generierung der Tick Marks und einer Aufgabe
+        generateNumberLine();
+        generateNewTask();
+    </script>
+</body>
+</html>
