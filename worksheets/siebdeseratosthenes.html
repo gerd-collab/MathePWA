@@ -52,25 +52,9 @@
             border: 2px solid transparent; /* Standardmäßig kein Rand */
         }
 
-        .prime {
-            background-color: #4caf50; /* Grün für Primzahlen */
-            border: 2px solid #ffffff; /* Weißer Rand für Primzahlen */
-        }
-
-        .multiple-1 {
-            background-color: #ff5722; /* Rot-Orange für Vielfache von 2 */
-        }
-
-        .multiple-2 {
-            background-color: #ff9800; /* Orange für Vielfache von 3 */
-        }
-
-        .multiple-3 {
-            background-color: #ffc107; /* Gelb für Vielfache von 5 */
-        }
-
-        .multiple-4 {
-            background-color: #8bc34a; /* Hellgrün für Vielfache von 7 */
+        .marked {
+            background-color: #f44336; /* Rot für markierte Zahlen */
+            border: 2px solid #ffffff; /* Weißer Rand für markierte Zahlen */
         }
 
         /* Button Styling */
@@ -141,9 +125,6 @@
         // Maximale Zahl für das Sieb
         const MAX_NUMBER = 100;
 
-        // Farben für Vielfache
-        const multipleColors = ['multiple-1', 'multiple-2', 'multiple-3', 'multiple-4'];
-
         // Array zur Darstellung der Zahlen
         let numbers = [];
         // Array der gefundenen Primzahlen
@@ -174,16 +155,16 @@
             updateButtons();
         }
 
-        // Prüft, ob eine Zahl als Vielfache markiert ist
-        function isMultiple(numDiv) {
-            return multipleColors.some(colorClass => numDiv.classList.contains(colorClass));
+        // Prüft, ob eine Zahl bereits markiert ist
+        function isMarked(numDiv) {
+            return numDiv.classList.contains('marked');
         }
 
         // Finde den nächsten Primfaktor (nur unmarkierte Zahlen)
         function findNextPrime() {
             for (let num of numbers) {
                 const numDiv = document.getElementById(`number-${num}`);
-                if (!primes.includes(num) && !isMultiple(numDiv)) {
+                if (!primes.includes(num) && !isMarked(numDiv)) {
                     return num;
                 }
             }
@@ -192,28 +173,26 @@
 
         // Markiere Vielfache eines Primfaktors
         function markMultiples(prime) {
-            const colorClass = multipleColors[currentStep % multipleColors.length];
             let markedMultiples = [];
 
             for (let multiple = prime * 2; multiple <= MAX_NUMBER; multiple += prime) {
                 const numDiv = document.getElementById(`number-${multiple}`);
-                if (!primes.includes(multiple) && !isMultiple(numDiv)) {
-                    numDiv.classList.add(colorClass);
+                if (!primes.includes(multiple) && !isMarked(numDiv)) {
+                    numDiv.classList.add('marked');
                     markedMultiples.push(multiple);
                 }
             }
 
             return {
                 prime: prime,
-                multiples: markedMultiples,
-                colorClass: colorClass
+                multiples: markedMultiples
             };
         }
 
         // Markiere eine Zahl als Primzahl
         function markPrime(prime) {
             const primeDiv = document.getElementById(`number-${prime}`);
-            primeDiv.classList.add('prime'); // Grün und weißer Rand
+            primeDiv.classList.add('marked'); // Rot markieren
             primes.push(prime);
         }
 
@@ -239,18 +218,18 @@
 
             // Entferne das letzte markierte Prime und die Vielfachen
             const lastStep = stepsHistory.pop();
-            const { prime, multiples, colorClass } = lastStep;
+            const { prime, multiples } = lastStep;
 
             // Entferne die Hervorhebung des letzten Primes
             const primeDiv = document.getElementById(`number-${prime}`);
-            primeDiv.classList.remove('prime');
+            primeDiv.classList.remove('marked');
             primes.pop();
             currentStep--;
 
             // Entferne die Markierungen der Vielfachen
             multiples.forEach(multiple => {
                 const numDiv = document.getElementById(`number-${multiple}`);
-                numDiv.classList.remove(colorClass);
+                numDiv.classList.remove('marked');
             });
 
             updateButtons();
