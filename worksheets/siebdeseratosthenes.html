@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sieb des Eratosthenes - Mathe Übung</title>
+    <style>
+        /* Dark Mode Styling */
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        /* Zurück-Button Styling */
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #333333;
+        }
+
+        /* Zahlenfeld Styling */
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 5px;
+        }
+
+        .number {
+            background-color: #1f1f1f;
+            padding: 10px;
+            text-align: center;
+            border-radius: 3px;
+            transition: background-color 0.3s, border 0.3s;
+            border: 2px solid transparent; /* Standardmäßig kein Rand */
+        }
+
+        .prime {
+            background-color: #4caf50; /* Grün für Primzahlen */
+        }
+
+        .current-prime {
+            border: 2px solid #ffffff; /* Weißer Rand für aktuelle Primzahl */
+        }
+
+        .multiple-1 {
+            background-color: #ff5722; /* Rot-Orange für Vielfache von 2 */
+        }
+
+        .multiple-2 {
+            background-color: #ff9800; /* Orange für Vielfache von 3 */
+        }
+
+        .multiple-3 {
+            background-color: #ffc107; /* Gelb für Vielfache von 5 */
+        }
+
+        .multiple-4 {
+            background-color: #8bc34a; /* Hellgrün für Vielfache von 7 */
+        }
+
+        /* Button Styling */
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: #333333;
+        }
+
+        /* Deaktivierte Buttons Styling */
+        .controls button:disabled {
+            background-color: #555555;
+            cursor: not-allowed;
+        }
+
+        /* Fußzeile Styling */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #1f1f1f;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Zurück-Button -->
+        <a href="../index.html" class="back-button">Zurück</a>
+
+        <h1>Sieb des Eratosthenes</h1>
+        <p>Ein Schritt-für-Schritt-Algorithmus zur Findung von Primzahlen.</p>
+
+        <!-- Zahlenfeld -->
+        <div id="numberGrid" class="number-grid">
+            <!-- Zahlen werden hier mit JavaScript eingefügt -->
+        </div>
+
+        <!-- Steuerung Buttons -->
+        <div class="controls">
+            <button id="backStep">Ein Schritt zurück</button>
+            <button id="nextStep">Nächster Schritt</button>
+            <button id="reset">Zurücksetzen</button>
+        </div>
+    </div>
+
+    <!-- Fußzeile -->
+    <footer>
+        Erstellt mit ♥ für Schüler, die Mathe üben wollen
+    </footer>
+
+    <script>
+        // Maximale Zahl für das Sieb
+        const MAX_NUMBER = 100;
+
+        // Farben für Vielfache
+        const multipleColors = ['multiple-1', 'multiple-2', 'multiple-3', 'multiple-4'];
+
+        // Array zur Darstellung der Zahlen
+        let numbers = [];
+        // Array der gefundenen Primzahlen
+        let primes = [];
+        // Aktueller Schritt
+        let currentStep = 0;
+        // Historie der Schritte
+        let stepsHistory = [];
+
+        // Initialisiere das Zahlenfeld
+        function initGrid() {
+            const grid = document.getElementById('numberGrid');
+            grid.innerHTML = '';
+            numbers = [];
+            primes = [];
+            currentStep = 0;
+            stepsHistory = [];
+
+            for (let i = 2; i <= MAX_NUMBER; i++) {
+                const numDiv = document.createElement('div');
+                numDiv.classList.add('number');
+                numDiv.textContent = i;
+                numDiv.id = `number-${i}`;
+                grid.appendChild(numDiv);
+                numbers.push(i);
+            }
+
+            updateButtons();
+        }
+
+        // Finde den nächsten Primfaktor
+        function findNextPrime() {
+            for (let num of numbers) {
+                if (!primes.includes(num)) {
+                    return num;
+                }
+            }
+            return null;
+        }
+
+        // Entfernt den weißen Rand von der vorherigen aktuellen Primzahl
+        function removeCurrentPrimeHighlight() {
+            const previous = document.querySelector('.current-prime');
+            if (previous) {
+                previous.classList.remove('current-prime');
+            }
+        }
+
+        // Markiere Vielfache eines Primfaktors
+        function markMultiples(prime) {
+            const colorClass = multipleColors[currentStep % multipleColors.length];
+            let markedMultiples = [];
+
+            for (let multiple = prime * 2; multiple <= MAX_NUMBER; multiple += prime) {
+                const numDiv = document.getElementById(`number-${multiple}`);
+                if (!primes.includes(multiple) && !numDiv.classList.contains(colorClass)) {
+                    numDiv.classList.add(colorClass);
+                    markedMultiples.push(multiple);
+                }
+            }
+
+            return {
+                prime: prime,
+                multiples: markedMultiples,
+                colorClass: colorClass
+            };
+        }
+
+        // Markiere eine Zahl als Primzahl und hebe sie hervor
+        function markPrime(prime) {
+            const primeDiv = document.getElementById(`number-${prime}`);
+            primeDiv.classList.add('prime');
+            primeDiv.classList.add('current-prime'); // Weißer Rand hinzufügen
+            primes.push(prime);
+        }
+
+        // Führe den nächsten Schritt des Siebs durch
+        function nextStep() {
+            const prime = findNextPrime();
+            if (prime) {
+                removeCurrentPrimeHighlight(); // Entferne vorherige Hervorhebung
+                markPrime(prime);
+                const multiplesInfo = markMultiples(prime);
+                stepsHistory.push(multiplesInfo);
+                currentStep++;
+                updateButtons();
+            } else {
+                alert('Sieb abgeschlossen!');
+            }
+        }
+
+        // Entferne den letzten Schritt des Siebs
+        function backStep() {
+            if (stepsHistory.length === 0) {
+                return;
+            }
+
+            // Entferne das letzte markierte Prime und die Vielfachen
+            const lastStep = stepsHistory.pop();
+            const { prime, multiples, colorClass } = lastStep;
+
+            // Entferne die Hervorhebung des letzten Primes
+            const primeDiv = document.getElementById(`number-${prime}`);
+            primeDiv.classList.remove('prime');
+            primeDiv.classList.remove('current-prime');
+            primes.pop();
+            currentStep--;
+
+            // Entferne die Markierungen der Vielfachen
+            multiples.forEach(multiple => {
+                const numDiv = document.getElementById(`number-${multiple}`);
+                numDiv.classList.remove(colorClass);
+            });
+
+            // Setze die aktuelle Hervorhebung auf den vorherigen Schritt
+            removeCurrentPrimeHighlight();
+            if (stepsHistory.length > 0) {
+                const previousStep = stepsHistory[stepsHistory.length - 1];
+                const previousPrimeDiv = document.getElementById(`number-${previousStep.prime}`);
+                previousPrimeDiv.classList.add('current-prime');
+            }
+
+            updateButtons();
+        }
+
+        // Setze das Sieb zurück
+        function resetSieve() {
+            initGrid();
+        }
+
+        // Aktualisiere den Status der Buttons
+        function updateButtons() {
+            const backButton = document.getElementById('backStep');
+            const nextButton = document.getElementById('nextStep');
+            const resetButton = document.getElementById('reset');
+
+            // Deaktiviere den "Ein Schritt zurück" Button, wenn keine Schritte vorhanden sind
+            backButton.disabled = stepsHistory.length === 0;
+
+            // Deaktiviere den "Nächster Schritt" Button, wenn das Sieb abgeschlossen ist
+            nextButton.disabled = findNextPrime() === null;
+
+            // "Zurücksetzen" Button immer aktiv
+            resetButton.disabled = false;
+        }
+
+        // Event Listener für Buttons
+        document.getElementById('nextStep').addEventListener('click', nextStep);
+        document.getElementById('backStep').addEventListener('click', backStep);
+        document.getElementById('reset').addEventListener('click', resetSieve);
+
+        // Initialisiere beim Laden der Seite
+        window.onload = initGrid;
+    </script>
+</body>
+</html>
