@@ -54,10 +54,7 @@
 
         .prime {
             background-color: #4caf50; /* Grün für Primzahlen */
-        }
-
-        .current-prime {
-            border: 2px solid #ffffff; /* Weißer Rand für aktuelle Primzahl */
+            border: 2px solid #ffffff; /* Weißer Rand für Primzahlen */
         }
 
         .multiple-1 {
@@ -177,22 +174,20 @@
             updateButtons();
         }
 
-        // Finde den nächsten Primfaktor
+        // Prüft, ob eine Zahl als Vielfache markiert ist
+        function isMultiple(numDiv) {
+            return multipleColors.some(colorClass => numDiv.classList.contains(colorClass));
+        }
+
+        // Finde den nächsten Primfaktor (nur unmarkierte Zahlen)
         function findNextPrime() {
             for (let num of numbers) {
-                if (!primes.includes(num)) {
+                const numDiv = document.getElementById(`number-${num}`);
+                if (!primes.includes(num) && !isMultiple(numDiv)) {
                     return num;
                 }
             }
             return null;
-        }
-
-        // Entfernt den weißen Rand von der vorherigen aktuellen Primzahl
-        function removeCurrentPrimeHighlight() {
-            const previous = document.querySelector('.current-prime');
-            if (previous) {
-                previous.classList.remove('current-prime');
-            }
         }
 
         // Markiere Vielfache eines Primfaktors
@@ -202,7 +197,7 @@
 
             for (let multiple = prime * 2; multiple <= MAX_NUMBER; multiple += prime) {
                 const numDiv = document.getElementById(`number-${multiple}`);
-                if (!primes.includes(multiple) && !numDiv.classList.contains(colorClass)) {
+                if (!primes.includes(multiple) && !isMultiple(numDiv)) {
                     numDiv.classList.add(colorClass);
                     markedMultiples.push(multiple);
                 }
@@ -215,11 +210,10 @@
             };
         }
 
-        // Markiere eine Zahl als Primzahl und hebe sie hervor
+        // Markiere eine Zahl als Primzahl
         function markPrime(prime) {
             const primeDiv = document.getElementById(`number-${prime}`);
-            primeDiv.classList.add('prime');
-            primeDiv.classList.add('current-prime'); // Weißer Rand hinzufügen
+            primeDiv.classList.add('prime'); // Grün und weißer Rand
             primes.push(prime);
         }
 
@@ -227,7 +221,6 @@
         function nextStep() {
             const prime = findNextPrime();
             if (prime) {
-                removeCurrentPrimeHighlight(); // Entferne vorherige Hervorhebung
                 markPrime(prime);
                 const multiplesInfo = markMultiples(prime);
                 stepsHistory.push(multiplesInfo);
@@ -251,7 +244,6 @@
             // Entferne die Hervorhebung des letzten Primes
             const primeDiv = document.getElementById(`number-${prime}`);
             primeDiv.classList.remove('prime');
-            primeDiv.classList.remove('current-prime');
             primes.pop();
             currentStep--;
 
@@ -260,14 +252,6 @@
                 const numDiv = document.getElementById(`number-${multiple}`);
                 numDiv.classList.remove(colorClass);
             });
-
-            // Setze die aktuelle Hervorhebung auf den vorherigen Schritt
-            removeCurrentPrimeHighlight();
-            if (stepsHistory.length > 0) {
-                const previousStep = stepsHistory[stepsHistory.length - 1];
-                const previousPrimeDiv = document.getElementById(`number-${previousStep.prime}`);
-                previousPrimeDiv.classList.add('current-prime');
-            }
 
             updateButtons();
         }
