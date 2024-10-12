@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taschenrechner</title>
+    <title>Wissenschaftlicher Taschenrechner</title>
     <style>
         /* Grundlegendes Reset */
         * {
@@ -21,7 +21,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            position: relative; /* Für das absolut positionierte Back-Button-Container */
+            position: relative; /* Für den absolut positionierten Zurück-Button */
         }
 
         /* Zurück Button Styling */
@@ -51,8 +51,8 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            width: 320px;
-            z-index: 1; /* Sicherstellen, dass der Rechner über dem Back-Button liegt */
+            width: 420px;
+            z-index: 1; /* Sicherstellen, dass der Rechner über dem Zurück-Button liegt */
         }
 
         .display {
@@ -60,7 +60,7 @@
             height: 60px;
             background-color: #333;
             color: #fff;
-            font-size: 2em;
+            font-size: 1.8em;
             text-align: right;
             padding: 10px;
             box-sizing: border-box;
@@ -73,17 +73,29 @@
             display: flex;
         }
 
-        .digits {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-gap: 10px;
+        /* Linker Bereich für Speicherfunktionen, wissenschaftliche Funktionen und Ziffern */
+        .left-buttons {
             flex: 3;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(7, 50px);
+            grid-gap: 10px;
         }
 
-        .digits button {
+        /* Rechter Bereich für Grundrechenarten und Gleichheits-Taste */
+        .right-buttons {
+            flex: 1;
+            display: grid;
+            grid-template-rows: repeat(5, 50px);
+            grid-gap: 10px;
+            margin-left: 10px; /* Abstand zum linken Bereich */
+        }
+
+        /* Gemeinsames Styling für alle Buttons */
+        .buttons button {
             width: 100%;
-            height: 60px;
-            font-size: 1.5em;
+            height: 100%;
+            font-size: 1.2em;
             background-color: #444;
             color: #fff;
             border: none;
@@ -92,48 +104,66 @@
             transition: background-color 0.2s;
         }
 
-        .digits button:hover {
+        .buttons button:hover {
             background-color: #555;
         }
 
-        .digits button:active {
+        .buttons button:active {
             background-color: #666;
         }
 
-        .operations {
-            display: flex;
-            flex-direction: column;
-            margin-left: 10px;
-            flex: 1;
+        /* Styling für wissenschaftliche Funktionen und Konstanten */
+        .left-buttons .function {
+            background-color: #555;
         }
 
-        .operations button {
-            width: 100%;
-            height: 60px;
-            font-size: 1.5em;
+        .left-buttons .function:hover {
+            background-color: #666;
+        }
+
+        /* Styling für Speicherfunktionen */
+        .left-buttons .memory {
+            background-color: #777;
+        }
+
+        .left-buttons .memory:hover {
+            background-color: #888;
+        }
+
+        /* Styling für Operatoren */
+        .right-buttons .operator {
             background-color: #ff9500;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .operations button:last-child {
-            margin-bottom: 0;
-        }
-
-        .operations button:hover {
+        .right-buttons .operator:hover {
             background-color: #e08e00;
         }
 
-        .operations button:active {
+        .right-buttons .operator:active {
             background-color: #c07700;
         }
 
+        /* Größere und grüne Gleichheits-Taste */
+        .right-buttons .equals {
+            background-color: #1abc9c; /* Grüner Hintergrund */
+            color: #fff;
+            font-size: 1.5em;
+            grid-row: span 2; /* Gleichheits-Taste erstreckt sich über zwei Reihen */
+        }
+
+        .right-buttons .equals:hover {
+            background-color: #16a085;
+        }
+
+        .right-buttons .equals:active {
+            background-color: #138d75;
+        }
+
         /* Responsive Anpassung */
-        @media (max-width: 400px) {
+        @media (max-width: 500px) {
             .calculator {
                 width: 90%;
             }
@@ -150,6 +180,12 @@
                 height: auto;
                 padding: 20px;
             }
+
+            /* Anpassung der Button-Größen auf kleinen Bildschirmen */
+            .left-buttons, .right-buttons {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(7, 50px);
+            }
         }
     </style>
 </head>
@@ -162,7 +198,26 @@
     <div class="calculator">
         <input type="text" class="display" id="display" value="0" readonly>
         <div class="buttons">
-            <div class="digits">
+            <!-- Linker Bereich für Speicherfunktionen, wissenschaftliche Funktionen und Ziffern -->
+            <div class="left-buttons">
+                <!-- Speicherfunktionen -->
+                <button class="memory" onclick="memoryClear()">MC</button>
+                <button class="memory" onclick="memoryRecall()">MR</button>
+                <button class="memory" onclick="memoryAdd()">M+</button>
+                <button class="memory" onclick="memorySubtract()">M-</button>
+                <!-- Wissenschaftliche Funktionen -->
+                <button class="function" onclick="appendToDisplay('sin(')">sin</button>
+                <button class="function" onclick="appendToDisplay('cos(')">cos</button>
+                <button class="function" onclick="appendToDisplay('tan(')">tan</button>
+                <button class="function" onclick="appendToDisplay('log(')">log</button>
+                <button class="function" onclick="appendToDisplay('ln(')">ln</button>
+                <button class="function" onclick="appendToDisplay('sqrt(')">√</button>
+                <button class="function" onclick="appendToDisplay('pi')">π</button>
+                <button class="function" onclick="appendToDisplay('e')">e</button>
+                <button class="function" onclick="appendToDisplay('(')">(</button>
+                <button class="function" onclick="appendToDisplay(')')">)</button>
+                <button class="function" onclick="clearDisplay()">C</button>
+                <!-- Ziffern und Dezimalpunkt -->
                 <button onclick="appendToDisplay('7')">7</button>
                 <button onclick="appendToDisplay('8')">8</button>
                 <button onclick="appendToDisplay('9')">9</button>
@@ -172,26 +227,44 @@
                 <button onclick="appendToDisplay('1')">1</button>
                 <button onclick="appendToDisplay('2')">2</button>
                 <button onclick="appendToDisplay('3')">3</button>
-                <button onclick="appendToDisplay('.')">.</button>
                 <button onclick="appendToDisplay('0')">0</button>
-                <button onclick="clearDisplay()">C</button>
+                <button onclick="appendToDisplay('.')">.</button>
             </div>
-            <div class="operations">
-                <button onclick="appendToDisplay('/')">÷</button>
-                <button onclick="appendToDisplay('*')">×</button>
-                <button onclick="appendToDisplay('-')">−</button>
-                <button onclick="appendToDisplay('+')">+</button>
-                <button onclick="calculate()">=</button>
+            <!-- Rechter Bereich für Grundrechenarten und Gleichheits-Taste -->
+            <div class="right-buttons">
+                <button class="operator" onclick="appendToDisplay('/')">÷</button>
+                <button class="operator" onclick="appendToDisplay('*')">×</button>
+                <button class="operator" onclick="appendToDisplay('-')">−</button>
+                <button class="operator" onclick="appendToDisplay('+')">+</button>
+                <button class="equals" onclick="calculate()">=</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Speichervariable
+        let memory = 0;
+
+        // Liste der wissenschaftlichen Funktionen und Konstanten
+        const scientificFunctions = ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'sqrt('];
+        const constants = ['pi', 'e'];
+
         function appendToDisplay(value) {
             const display = document.getElementById('display');
-            // Wenn die aktuelle Anzeige '0' ist, ersetzen wir sie durch den neuen Wert
-            if (display.value === '0' && value !== '.') {
-                display.value = value;
+            const currentValue = display.value;
+
+            // Prüfen, ob der gedrückte Wert eine wissenschaftliche Funktion oder Konstante ist
+            const isFunction = scientificFunctions.includes(value);
+            const isConstant = constants.includes(value);
+
+            if (currentValue === '0') {
+                if (isFunction || isConstant) {
+                    display.value = value;
+                } else if (!isNaN(value) || value === '.') {
+                    display.value = value;
+                } else {
+                    display.value += value;
+                }
             } else {
                 display.value += value;
             }
@@ -200,17 +273,79 @@
         function calculate() {
             let expression = document.getElementById('display').value;
             try {
-                // Ersetze das Divisionszeichen für die Berechnung
-                expression = expression.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-');
+                // Ersetze spezielle Symbole durch JavaScript verständliche Symbole
+                expression = expression.replace(/÷/g, '/')
+                                       .replace(/×/g, '*')
+                                       .replace(/−/g, '-')
+                                       .replace(/π/g, Math.PI)
+                                       .replace(/e/g, Math.E)
+                                       .replace(/sqrt\(/g, 'Math.sqrt(')
+                                       .replace(/sin\(/g, 'Math.sin(')
+                                       .replace(/cos\(/g, 'Math.cos(')
+                                       .replace(/tan\(/g, 'Math.tan(')
+                                       .replace(/log\(/g, 'Math.log10(')
+                                       .replace(/ln\(/g, 'Math.log(')
+                                       .replace(/\^/g, '**');
+
+                // Sicherheitscheck: Erlaube nur bestimmte Zeichen und Funktionen
+                if (/[^-+*\/().0-9 Math.sqrt Math.sin Math.cos Math.tan Math.log10 Math.log **]/.test(expression)) {
+                    throw new Error('Ungültige Zeichen im Ausdruck');
+                }
+
                 let result = eval(expression);
-                document.getElementById('display').value = result;
+                // Formatierung des Ergebnisses
+                if (!isFinite(result)) {
+                    throw new Error('Unendliches Ergebnis');
+                }
+                document.getElementById('display').value = parseFloat(result.toFixed(10));
             } catch (error) {
                 alert('Ungültiger Ausdruck');
+                clearDisplay();
             }
         }
 
         function clearDisplay() {
             document.getElementById('display').value = '0';
+        }
+
+        // Speicherfunktionen
+        function memoryClear() {
+            memory = 0;
+            alert('Speicher gelöscht');
+        }
+
+        function memoryRecall() {
+            document.getElementById('display').value = memory;
+        }
+
+        function memoryAdd() {
+            const display = document.getElementById('display').value;
+            try {
+                const value = parseFloat(display);
+                if (!isNaN(value)) {
+                    memory += value;
+                    alert(`Zum Speicher hinzugefügt: ${value}`);
+                } else {
+                    throw new Error('Ungültiger Wert');
+                }
+            } catch (error) {
+                alert('Ungültiger Ausdruck zum Hinzufügen zum Speicher');
+            }
+        }
+
+        function memorySubtract() {
+            const display = document.getElementById('display').value;
+            try {
+                const value = parseFloat(display);
+                if (!isNaN(value)) {
+                    memory -= value;
+                    alert(`Vom Speicher subtrahiert: ${value}`);
+                } else {
+                    throw new Error('Ungültiger Wert');
+                }
+            } catch (error) {
+                alert('Ungültiger Ausdruck zum Subtrahieren vom Speicher');
+            }
         }
     </script>
 </body>
