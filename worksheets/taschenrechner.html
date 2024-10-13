@@ -5,348 +5,393 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wissenschaftlicher Taschenrechner</title>
     <style>
-        /* Grundlegendes Reset */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Dark Mode Styles */
+        /* Dark Mode Styling */
         body {
             background-color: #121212;
             color: #ffffff;
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             height: 100vh;
-            position: relative; /* Für den absolut positionierten Zurück-Button */
+            margin: 0;
+            padding: 20px;
         }
 
-        /* Zurück Button Styling */
-        .back-button-container {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-
-        .back-button-container button {
-            padding: 8px 16px;
-            cursor: pointer;
-            background-color: #555;
-            color: white;
+        /* Back Button Styling */
+        .back-button {
+            align-self: flex-start;
+            background-color: #1e1e1e;
             border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin-bottom: 20px;
             border-radius: 5px;
+            cursor: pointer;
             transition: background-color 0.3s;
-            font-size: 14px;
         }
 
-        .back-button-container button:hover {
-            background-color: #333;
+        .back-button:hover {
+            background-color: #333333;
         }
 
+        /* Calculator Container */
         .calculator {
             background-color: #1e1e1e;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            width: 420px;
-            z-index: 1; /* Sicherstellen, dass der Rechner über dem Zurück-Button liegt */
+            box-shadow: 0 0 10px #000;
+            width: 350px;
         }
 
+        /* Display Styling */
         .display {
-            width: 100%;
-            height: 60px;
-            background-color: #333;
-            color: #fff;
-            font-size: 1.8em;
-            text-align: right;
+            background-color: #2c2c2c;
+            color: #ffffff;
+            font-size: 24px;
             padding: 10px;
-            box-sizing: border-box;
-            border: none;
             border-radius: 5px;
-            margin-bottom: 20px;
+            text-align: right;
+            overflow-x: auto;
+            word-wrap: break-word;
+            min-height: 50px;
+            margin-bottom: 10px;
         }
 
+        /* Buttons Grid */
         .buttons {
-            display: flex;
-        }
-
-        /* Linker Bereich für Speicherfunktionen, wissenschaftliche Funktionen und Ziffern */
-        .left-buttons {
-            flex: 3;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(7, 50px);
+            grid-template-columns: repeat(5, 1fr);
             grid-gap: 10px;
         }
 
-        /* Rechter Bereich für Grundrechenarten und Gleichheits-Taste */
-        .right-buttons {
-            flex: 1;
-            display: grid;
-            grid-template-rows: repeat(5, 50px);
-            grid-gap: 10px;
-            margin-left: 10px; /* Abstand zum linken Bereich */
-        }
-
-        /* Gemeinsames Styling für alle Buttons */
-        .buttons button {
-            width: 100%;
-            height: 100%;
-            font-size: 1.2em;
-            background-color: #444;
-            color: #fff;
+        /* Button Styling */
+        .button {
+            background-color: #3a3a3a;
             border: none;
+            color: #ffffff;
+            padding: 15px;
+            font-size: 18px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s;
         }
 
-        .buttons button:hover {
-            background-color: #555;
+        .button:hover {
+            background-color: #555555;
         }
 
-        .buttons button:active {
-            background-color: #666;
+        /* Span Two Columns */
+        .span-two {
+            grid-column: span 2;
         }
 
-        /* Styling für wissenschaftliche Funktionen und Konstanten */
-        .left-buttons .function {
-            background-color: #555;
-        }
-
-        .left-buttons .function:hover {
-            background-color: #666;
-        }
-
-        /* Styling für Speicherfunktionen */
-        .left-buttons .memory {
-            background-color: #777;
-        }
-
-        .left-buttons .memory:hover {
-            background-color: #888;
-        }
-
-        /* Styling für Operatoren */
-        .right-buttons .operator {
+        /* Specific Button Colors */
+        .button.function {
             background-color: #ff9500;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        .right-buttons .operator:hover {
-            background-color: #e08e00;
+        .button.function:hover {
+            background-color: #ffa733;
         }
 
-        .right-buttons .operator:active {
-            background-color: #c07700;
+        .button.operator {
+            background-color: #ff2d55;
         }
 
-        /* Größere und grüne Gleichheits-Taste */
-        .right-buttons .equals {
-            background-color: #1abc9c; /* Grüner Hintergrund */
-            color: #fff;
-            font-size: 1.5em;
-            grid-row: span 2; /* Gleichheits-Taste erstreckt sich über zwei Reihen */
+        .button.operator:hover {
+            background-color: #ff5e80;
         }
 
-        .right-buttons .equals:hover {
-            background-color: #16a085;
+        .button.equal {
+            background-color: #34c759;
+            grid-column: span 2;
         }
 
-        .right-buttons .equals:active {
-            background-color: #138d75;
+        .button.equal:hover {
+            background-color: #5cd68d;
         }
 
-        /* Responsive Anpassung */
-        @media (max-width: 500px) {
-            .calculator {
-                width: 90%;
-            }
+        .button.clear {
+            background-color: #ff3b30;
+        }
 
-            /* Anpassung für den Zurück-Button auf kleinen Bildschirmen */
-            .back-button-container {
-                position: static;
-                margin-bottom: 20px;
-                text-align: center;
-            }
+        .button.clear:hover {
+            background-color: #ff6b6b;
+        }
 
-            body {
-                flex-direction: column;
-                height: auto;
-                padding: 20px;
-            }
+        /* Memory Buttons Styling */
+        .button.memory {
+            background-color: #5856d6;
+        }
 
-            /* Anpassung der Button-Größen auf kleinen Bildschirmen */
-            .left-buttons, .right-buttons {
-                grid-template-columns: repeat(4, 1fr);
-                grid-template-rows: repeat(7, 50px);
-            }
+        .button.memory:hover {
+            background-color: #7a7be0;
+        }
+
+        /* +/- Button Styling */
+        .button.toggle-sign {
+            background-color: #007BFF; /* Blau */
+            color: #ffffff;
+        }
+
+        .button.toggle-sign:hover {
+            background-color: #339CFF; /* Hellere Blautönung beim Hover */
         }
     </style>
 </head>
 <body>
-    <!-- Zurück Button -->
-    <div class="back-button-container">
-        <button onclick="window.location.href='../index.html'">Zurück</button>
-    </div>
 
+    <!-- Zurück-Button -->
+    <button class="back-button" onclick="window.location.href='../index.html'">← Zurück</button>
+
+    <!-- Taschenrechner Container -->
     <div class="calculator">
-        <input type="text" class="display" id="display" value="0" readonly>
+        <!-- Display -->
+        <div id="display" class="display">0</div>
+
+        <!-- Buttons -->
         <div class="buttons">
-            <!-- Linker Bereich für Speicherfunktionen, wissenschaftliche Funktionen und Ziffern -->
-            <div class="left-buttons">
-                <!-- Speicherfunktionen -->
-                <button class="memory" onclick="memoryClear()">MC</button>
-                <button class="memory" onclick="memoryRecall()">MR</button>
-                <button class="memory" onclick="memoryAdd()">M+</button>
-                <button class="memory" onclick="memorySubtract()">M-</button>
-                <!-- Wissenschaftliche Funktionen -->
-                <button class="function" onclick="appendToDisplay('sin(')">sin</button>
-                <button class="function" onclick="appendToDisplay('cos(')">cos</button>
-                <button class="function" onclick="appendToDisplay('tan(')">tan</button>
-                <button class="function" onclick="appendToDisplay('log(')">log</button>
-                <button class="function" onclick="appendToDisplay('ln(')">ln</button>
-                <button class="function" onclick="appendToDisplay('sqrt(')">√</button>
-                <button class="function" onclick="appendToDisplay('pi')">π</button>
-                <button class="function" onclick="appendToDisplay('e')">e</button>
-                <button class="function" onclick="appendToDisplay('(')">(</button>
-                <button class="function" onclick="appendToDisplay(')')">)</button>
-                <button class="function" onclick="clearDisplay()">C</button>
-                <!-- Ziffern und Dezimalpunkt -->
-                <button onclick="appendToDisplay('7')">7</button>
-                <button onclick="appendToDisplay('8')">8</button>
-                <button onclick="appendToDisplay('9')">9</button>
-                <button onclick="appendToDisplay('4')">4</button>
-                <button onclick="appendToDisplay('5')">5</button>
-                <button onclick="appendToDisplay('6')">6</button>
-                <button onclick="appendToDisplay('1')">1</button>
-                <button onclick="appendToDisplay('2')">2</button>
-                <button onclick="appendToDisplay('3')">3</button>
-                <button onclick="appendToDisplay('0')">0</button>
-                <button onclick="appendToDisplay('.')">.</button>
-            </div>
-            <!-- Rechter Bereich für Grundrechenarten und Gleichheits-Taste -->
-            <div class="right-buttons">
-                <button class="operator" onclick="appendToDisplay('/')">÷</button>
-                <button class="operator" onclick="appendToDisplay('*')">×</button>
-                <button class="operator" onclick="appendToDisplay('-')">−</button>
-                <button class="operator" onclick="appendToDisplay('+')">+</button>
-                <button class="equals" onclick="calculate()">=</button>
-            </div>
+            <!-- Speicher Buttons (Neue Zeile) -->
+            <button class="button memory" onclick="memoryClear()">MC</button>
+            <button class="button memory" onclick="memoryRecall()">MR</button>
+            <button class="button memory" onclick="memoryStore()">MS</button>
+            <button class="button memory" onclick="memoryAdd()">M+</button>
+            <button class="button memory" onclick="memorySubtract()">M-</button>
+
+            <!-- Row 1 -->
+            <button class="button function" onclick="appendFunction('sin(')">sin</button>
+            <button class="button function" onclick="appendFunction('cos(')">cos</button>
+            <button class="button function" onclick="appendFunction('tan(')">tan</button>
+            <button class="button operator" onclick="appendOperator('(')">(</button>
+            <button class="button operator" onclick="appendOperator(')')">)</button>
+
+            <!-- Row 2 -->
+            <button class="button function" onclick="appendFunction('log(')">log</button>
+            <button class="button function" onclick="appendFunction('ln(')">ln</button>
+            <button class="button function" onclick="appendFunction('sqrt(')">√</button>
+            <button class="button operator" onclick="appendOperator('^')">^</button>
+            <button class="button clear" onclick="clearDisplay()">C</button>
+
+            <!-- Row 3 -->
+            <button class="button" onclick="appendNumber('7')">7</button>
+            <button class="button" onclick="appendNumber('8')">8</button>
+            <button class="button" onclick="appendNumber('9')">9</button>
+            <button class="button operator" onclick="appendOperator('/')">÷</button>
+            <button class="button operator" onclick="backspace()">⌫</button>
+
+            <!-- Row 4 -->
+            <button class="button" onclick="appendNumber('4')">4</button>
+            <button class="button" onclick="appendNumber('5')">5</button>
+            <button class="button" onclick="appendNumber('6')">6</button>
+            <button class="button operator" onclick="appendOperator('*')">×</button>
+            <button class="button" onclick="appendConstant('π')">π</button>
+
+            <!-- Row 5 -->
+            <button class="button" onclick="appendNumber('1')">1</button>
+            <button class="button" onclick="appendNumber('2')">2</button>
+            <button class="button" onclick="appendNumber('3')">3</button>
+            <button class="button operator" onclick="appendOperator('-')">−</button>
+            <button class="button" onclick="appendConstant('e')">e</button>
+
+            <!-- Row 6 -->
+            <button class="button span-two" onclick="appendNumber('0')">0</button>
+            <button class="button" onclick="appendDecimal()">.</button>
+            <button class="button operator" onclick="appendOperator('+')">+</button>
+            <button class="button toggle-sign" onclick="toggleSign()">±</button>
+            <button class="button equal" onclick="calculate()">=</button>
         </div>
     </div>
 
     <script>
-        // Speichervariable
+        const display = document.getElementById('display');
         let memory = 0;
 
-        // Liste der wissenschaftlichen Funktionen und Konstanten
-        const scientificFunctions = ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'sqrt('];
-        const constants = ['pi', 'e'];
+        // Append number to display
+        function appendNumber(number) {
+            if (display.innerText === '0' || display.innerText === 'Error') {
+                display.innerText = number;
+            } else {
+                display.innerText += number;
+            }
+        }
 
-        function appendToDisplay(value) {
-            const display = document.getElementById('display');
-            const currentValue = display.value;
+        // Append decimal point
+        function appendDecimal() {
+            if (display.innerText === 'Error') return;
+            // Prevent multiple decimals in a number
+            const parts = display.innerText.split(/[\+\-\*\/\^\(\)]/);
+            const lastPart = parts[parts.length - 1];
+            if (!lastPart.includes('.')) {
+                display.innerText += '.';
+            }
+        }
 
-            // Prüfen, ob der gedrückte Wert eine wissenschaftliche Funktion oder Konstante ist
-            const isFunction = scientificFunctions.includes(value);
-            const isConstant = constants.includes(value);
+        // Append operator to display
+        function appendOperator(operator) {
+            if (display.innerText === 'Error') return;
+            // Entfernt '0' vor einem Operator, falls erforderlich
+            if (display.innerText === '0' && operator === '-') {
+                display.innerText = '-';
+                return;
+            }
 
-            if (currentValue === '0') {
-                if (isFunction || isConstant) {
-                    display.value = value;
-                } else if (!isNaN(value) || value === '.') {
-                    display.value = value;
-                } else {
-                    display.value += value;
+            const lastChar = display.innerText.slice(-1);
+            if ('+-*/^'.includes(lastChar)) {
+                display.innerText = display.innerText.slice(0, -1) + operator;
+            } else {
+                display.innerText += operator;
+            }
+        }
+
+        // Append function to display
+        function appendFunction(func) {
+            if (display.innerText === '0' || display.innerText === 'Error') {
+                display.innerText = func;
+            } else {
+                display.innerText += func;
+            }
+        }
+
+        // Append constants like π und e
+        function appendConstant(constant) {
+            if (display.innerText === '0' || display.innerText === 'Error') {
+                if (constant === 'π') {
+                    display.innerText = 'pi';
+                } else if (constant === 'e') {
+                    display.innerText = 'e';
                 }
             } else {
-                display.value += value;
+                if (constant === 'π') {
+                    display.innerText += 'pi';
+                } else if (constant === 'e') {
+                    display.innerText += 'e';
+                }
             }
         }
 
-        function calculate() {
-            let expression = document.getElementById('display').value;
-            try {
-                // Ersetze spezielle Symbole durch JavaScript verständliche Symbole
-                expression = expression.replace(/÷/g, '/')
-                                       .replace(/×/g, '*')
-                                       .replace(/−/g, '-')
-                                       .replace(/π/g, Math.PI)
-                                       .replace(/e/g, Math.E)
-                                       .replace(/sqrt\(/g, 'Math.sqrt(')
-                                       .replace(/sin\(/g, 'Math.sin(')
-                                       .replace(/cos\(/g, 'Math.cos(')
-                                       .replace(/tan\(/g, 'Math.tan(')
-                                       .replace(/log\(/g, 'Math.log10(')
-                                       .replace(/ln\(/g, 'Math.log(')
-                                       .replace(/\^/g, '**');
-
-                // Sicherheitscheck: Erlaube nur bestimmte Zeichen und Funktionen
-                if (/[^-+*\/().0-9 Math.sqrt Math.sin Math.cos Math.tan Math.log10 Math.log **]/.test(expression)) {
-                    throw new Error('Ungültige Zeichen im Ausdruck');
-                }
-
-                let result = eval(expression);
-                // Formatierung des Ergebnisses
-                if (!isFinite(result)) {
-                    throw new Error('Unendliches Ergebnis');
-                }
-                document.getElementById('display').value = parseFloat(result.toFixed(10));
-            } catch (error) {
-                alert('Ungültiger Ausdruck');
-                clearDisplay();
-            }
-        }
-
+        // Clear display
         function clearDisplay() {
-            document.getElementById('display').value = '0';
+            display.innerText = '0';
         }
 
-        // Speicherfunktionen
+        // Backspace function
+        function backspace() {
+            if (display.innerText === 'Error') {
+                display.innerText = '0';
+                return;
+            }
+            if (display.innerText.length > 1) {
+                display.innerText = display.innerText.slice(0, -1);
+            } else {
+                display.innerText = '0';
+            }
+        }
+
+        // Toggle sign function
+        function toggleSign() {
+            if (display.innerText === '0' || display.innerText === 'Error') return;
+
+            // Regex to find the last number in the expression
+            const regex = /(-?\d+(\.\d+)?)$/;
+            const match = display.innerText.match(regex);
+            if (match) {
+                const number = match[0];
+                const toggledNumber = number.startsWith('-') ? number.slice(1) : '-' + number;
+                display.innerText = display.innerText.slice(0, -number.length) + toggledNumber;
+            }
+        }
+
+        // Memory functions
         function memoryClear() {
             memory = 0;
-            alert('Speicher gelöscht');
         }
 
         function memoryRecall() {
-            document.getElementById('display').value = memory;
+            if (display.innerText === 'Error') {
+                display.innerText = '0';
+            }
+            display.innerText = formatNumber(memory);
+        }
+
+        function memoryStore() {
+            try {
+                const value = evaluateExpression(display.innerText);
+                memory = value;
+            } catch (error) {
+                display.innerText = 'Error';
+            }
         }
 
         function memoryAdd() {
-            const display = document.getElementById('display').value;
             try {
-                const value = parseFloat(display);
-                if (!isNaN(value)) {
-                    memory += value;
-                    alert(`Zum Speicher hinzugefügt: ${value}`);
-                } else {
-                    throw new Error('Ungültiger Wert');
-                }
+                const value = evaluateExpression(display.innerText);
+                memory += value;
             } catch (error) {
-                alert('Ungültiger Ausdruck zum Hinzufügen zum Speicher');
+                display.innerText = 'Error';
             }
         }
 
         function memorySubtract() {
-            const display = document.getElementById('display').value;
             try {
-                const value = parseFloat(display);
-                if (!isNaN(value)) {
-                    memory -= value;
-                    alert(`Vom Speicher subtrahiert: ${value}`);
-                } else {
-                    throw new Error('Ungültiger Wert');
-                }
+                const value = evaluateExpression(display.innerText);
+                memory -= value;
             } catch (error) {
-                alert('Ungültiger Ausdruck zum Subtrahieren vom Speicher');
+                display.innerText = 'Error';
+            }
+        }
+
+        // Calculate the result
+        function calculate() {
+            try {
+                const result = evaluateExpression(display.innerText);
+                display.innerText = formatNumber(result);
+            } catch (error) {
+                display.innerText = 'Error';
+            }
+        }
+
+        // Helper function to evaluate expressions
+        function evaluateExpression(expression) {
+            // Replace constants
+            expression = expression.replace(/pi/g, Math.PI);
+            expression = expression.replace(/e/g, Math.E);
+
+            // Replace functions with Math equivalents
+            expression = expression.replace(/sin\(/g, 'Math.sin(degToRad(');
+            expression = expression.replace(/cos\(/g, 'Math.cos(degToRad(');
+            expression = expression.replace(/tan\(/g, 'Math.tan(degToRad(');
+            expression = expression.replace(/log\(/g, 'Math.log10(');
+            expression = expression.replace(/ln\(/g, 'Math.log(');
+            expression = expression.replace(/sqrt\(/g, 'Math.sqrt(');
+            expression = expression.replace(/\^/g, '**');
+
+            // Function to convert degrees to radians
+            function degToRad(degrees) {
+                return degrees * (Math.PI / 180);
+            }
+
+            // Evaluate the expression
+            const result = eval(expression);
+            if (isNaN(result) || !isFinite(result)) {
+                throw new Error('Invalid Calculation');
+            }
+            return result;
+        }
+
+        // Helper function to format numbers (optional, for better readability)
+        function formatNumber(num) {
+            if (Number.isInteger(num)) {
+                return num.toString();
+            } else {
+                return parseFloat(num.toFixed(10)).toString(); // Limit to 10 decimal places
             }
         }
     </script>
+
 </body>
 </html>
