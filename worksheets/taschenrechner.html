@@ -210,11 +210,13 @@
     <script>
         const display = document.getElementById('display');
         let memory = 0;
+        let isResultDisplayed = false; // Zustand, ob das Ergebnis angezeigt wird
 
         // Append number to display
         function appendNumber(number) {
-            if (display.innerText === '0' || display.innerText === 'Error') {
+            if (display.innerText === '0' || display.innerText === 'Error' || isResultDisplayed) {
                 display.innerText = number;
+                isResultDisplayed = false;
             } else {
                 display.innerText += number;
             }
@@ -223,6 +225,11 @@
         // Append decimal point
         function appendDecimal() {
             if (display.innerText === 'Error') return;
+            if (isResultDisplayed) {
+                display.innerText = '0.';
+                isResultDisplayed = false;
+                return;
+            }
             // Prevent multiple decimals in a number
             const parts = display.innerText.split(/[\+\-\*\/\^\(\)]/);
             const lastPart = parts[parts.length - 1];
@@ -246,43 +253,52 @@
             } else {
                 display.innerText += operator;
             }
+            isResultDisplayed = false;
         }
 
         // Append function to display
         function appendFunction(func) {
-            if (display.innerText === '0' || display.innerText === 'Error') {
+            if (display.innerText === '0' || display.innerText === 'Error' || isResultDisplayed) {
                 display.innerText = func;
             } else {
                 display.innerText += func;
             }
+            isResultDisplayed = false;
         }
 
-        // Append constants like π und e
+        // Append constants wie π und e
         function appendConstant(constant) {
-            if (display.innerText === '0' || display.innerText === 'Error') {
+            if (display.innerText === '0' || display.innerText === 'Error' || isResultDisplayed) {
                 if (constant === 'π') {
                     display.innerText = 'pi';
                 } else if (constant === 'e') {
                     display.innerText = 'e';
                 }
             } else {
-                if (constant === 'π') {
+                if (constant === 'π') { // Korrigierte Bedingung von 'pi' zu 'π'
                     display.innerText += 'pi';
                 } else if (constant === 'e') {
                     display.innerText += 'e';
                 }
             }
+            isResultDisplayed = false;
         }
 
         // Clear display
         function clearDisplay() {
             display.innerText = '0';
+            isResultDisplayed = false;
         }
 
         // Backspace function
         function backspace() {
             if (display.innerText === 'Error') {
                 display.innerText = '0';
+                return;
+            }
+            if (isResultDisplayed) {
+                display.innerText = '0';
+                isResultDisplayed = false;
                 return;
             }
             if (display.innerText.length > 1) {
@@ -314,14 +330,17 @@
         function memoryRecall() {
             if (display.innerText === 'Error') {
                 display.innerText = '0';
+            } else {
+                display.innerText = formatNumber(memory);
             }
-            display.innerText = formatNumber(memory);
+            isResultDisplayed = true;
         }
 
         function memoryStore() {
             try {
                 const value = evaluateExpression(display.innerText);
                 memory = value;
+                isResultDisplayed = true;
             } catch (error) {
                 display.innerText = 'Error';
             }
@@ -331,6 +350,7 @@
             try {
                 const value = evaluateExpression(display.innerText);
                 memory += value;
+                isResultDisplayed = true;
             } catch (error) {
                 display.innerText = 'Error';
             }
@@ -340,6 +360,7 @@
             try {
                 const value = evaluateExpression(display.innerText);
                 memory -= value;
+                isResultDisplayed = true;
             } catch (error) {
                 display.innerText = 'Error';
             }
@@ -350,18 +371,23 @@
             try {
                 const result = evaluateExpression(display.innerText);
                 display.innerText = formatNumber(result);
+                isResultDisplayed = true;
             } catch (error) {
                 display.innerText = 'Error';
+                isResultDisplayed = true;
             }
         }
 
         // Helper function to evaluate expressions
         function evaluateExpression(expression) {
-            // Replace constants
+            // Ersetze gemischte Brüche und einfache Brüche (falls vorhanden)
+            // Hier wird nur eine grundlegende Berechnung ohne Bruchrechnung durchgeführt
+
+            // Ersetze Konstanten
             expression = expression.replace(/pi/g, Math.PI);
             expression = expression.replace(/e/g, Math.E);
 
-            // Replace functions with Math equivalents
+            // Ersetze Funktionen mit Math-Äquivalenten
             expression = expression.replace(/sin\(/g, 'Math.sin(degToRad(');
             expression = expression.replace(/cos\(/g, 'Math.cos(degToRad(');
             expression = expression.replace(/tan\(/g, 'Math.tan(degToRad(');
@@ -370,15 +396,22 @@
             expression = expression.replace(/sqrt\(/g, 'Math.sqrt(');
             expression = expression.replace(/\^/g, '**');
 
-            // Function to convert degrees to radians
+            // Funktion zur Umrechnung von Grad in Bogenmaß
             function degToRad(degrees) {
                 return degrees * (Math.PI / 180);
             }
 
-            // Evaluate the expression
+            // Überprüfe, ob alle Klammern geschlossen sind
+            const openBrackets = (expression.match(/\(/g) || []).length;
+            const closeBrackets = (expression.match(/\)/g) || []).length;
+            if (openBrackets !== closeBrackets) {
+                throw new Error('Ungültige Klammern');
+            }
+
+            // Evaluiere den Ausdruck
             const result = eval(expression);
             if (isNaN(result) || !isFinite(result)) {
-                throw new Error('Invalid Calculation');
+                throw new Error('Ungültige Berechnung');
             }
             return result;
         }
